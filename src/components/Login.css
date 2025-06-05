@@ -1,0 +1,75 @@
+.login-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.login-card {
+  background: #94c8f7;
+  border-radius: 40px;
+  padding: 48px 32px 32px 32px;
+  width: 800px;
+  max-width: 95vw;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-title {
+  font-family: 'Oswald', Arial, sans-serif;
+  font-size: 48px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-bottom: 40px;
+}
+
+.login-label {
+  font-family: 'Oswald', Arial, sans-serif;
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  display: block;
+  letter-spacing: 1px;
+}
+
+.login-input {
+  width: 350px;
+  max-width: 80vw;
+  height: 44px;
+  font-size: 20px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 2px;
+  padding: 0 10px;
+  background: #fff;
+  box-sizing: border-box;
+  display: block;
+}
+
+.login-forgot {
+  font-family: 'Oswald', Arial, sans-serif;
+  font-size: 16px;
+  margin-top: 2px;
+  margin-bottom: 20px;
+  color: #222;
+  letter-spacing: 1px;
+}
+
+.login-footer {
+  margin-top: 30px;
+  font-family: 'Oswald', Arial, sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: #111;
+}
+
+.login-register {
+  color: #2a3cff;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 4px;
+}

@@ -1,0 +1,35 @@
+{
+  "name": "desktop-frontend-app",
+  "version": "1.0.0",
+  "description": "A desktop application front-end built with JavaScript based on Figma designs.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "webpack --mode production",
+    "test": "jest"
+  },
+  "keywords": [
+    "desktop",
+    "frontend",
+    "javascript"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-react": "^7.27.1",
+    "babel-loader": "^10.0.0",
+    "css-loader": "^7.1.2",
+    "electron": "^36.4.0",
+    "jest": "^27.0.6",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1"
+  }
+}
