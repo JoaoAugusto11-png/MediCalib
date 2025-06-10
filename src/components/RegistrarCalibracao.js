@@ -117,7 +117,21 @@ export default function RegistrarCalibracao({ username, onBack }) {
             <div style={{ fontWeight: 'bold', fontSize: 18 }}>{username?.toUpperCase()}</div>
             <div style={{ fontSize: 14 }}>ESTAGIÁRIO (EMPRESA X)</div>
           </div>
-          <button style={submitBtn} onClick={onBack}>⟵ VOLTAR</button>
+          <button
+            style={{
+              ...submitBtn,
+              width: '100%',
+              marginTop: 0,
+              marginBottom: 16,
+              background: '#b3d7f7', // <-- azul claro igual ao da imagem
+              color: '#222',
+              position: 'relative',
+              zIndex: 1
+            }}
+            onClick={onBack}
+          >
+            ⟵ VOLTAR
+          </button>
         </div>
       </div>
       <div style={{ flex: 1, padding: 32 }}>
