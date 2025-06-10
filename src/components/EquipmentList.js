@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function EquipmentList({ username, equipments, onRegisterClick }) {
+export default function EquipmentList({ username, equipments, onRegisterClick, onCalibracaoClick }) {
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       <div style={{
@@ -20,7 +20,7 @@ export default function EquipmentList({ username, equipments, onRegisterClick })
           <button style={menuBtn} onClick={onRegisterClick}>REGISTRAR EQUIPAMENTO</button>
           <button style={menuBtn}>LISTA DE EQUIPAMENTOS</button>
           <button style={menuBtn}>AGENDAR MANUTENÇÃO</button>
-          <button style={menuBtn}>REGISTRAR CALIBRAÇÃO</button>
+          <button style={menuBtn} onClick={onCalibracaoClick}>REGISTRAR CALIBRAÇÃO</button>
         </div>
         <button style={exitBtn}>⟵ SAIR</button>
       </div>
