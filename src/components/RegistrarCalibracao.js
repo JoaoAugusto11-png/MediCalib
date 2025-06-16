@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import jsPDF from "jspdf";
 
 function calcularStatus(valoresReferencia, valoresCalibrado, tolerancia) {
   for (let i = 0; i < 3; i++) {
@@ -88,6 +89,60 @@ export default function RegistrarCalibracao({ username, onBack }) {
     }
   }
 
+  function gerarLaudoPDF(dados, status) {
+    const doc = new jsPDF();
+
+    // Cabeçalho com fundo azul
+    doc.setFillColor(148, 200, 247); // azul claro
+    doc.rect(0, 0, 210, 25, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(33, 33, 33);
+    doc.text("Laudo de Calibração", 105, 17, { align: "center" });
+
+    // Dados principais
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Data: ${dados.data}`, 10, 35);
+    doc.text(`Técnico: ${dados.tecnico}`, 10, 43);
+    doc.text(`Temperatura: ${dados.temperatura} °C`, 10, 51);
+    doc.text(`Umidade: ${dados.umidade} %`, 10, 59);
+    doc.text(`Tolerância: ${dados.tolerancia}`, 10, 67);
+
+    // Tabela de valores
+    doc.setFont("helvetica", "bold");
+    doc.text("Valores", 10, 80);
+    doc.setFont("helvetica", "normal");
+    doc.text("Referência", 40, 80);
+    doc.text("Calibrado", 90, 80);
+
+    for (let i = 0; i < 3; i++) {
+      doc.text(`Valor ${i + 1}:`, 10, 90 + i * 10);
+      doc.text(String(dados.valoresReferencia[i]), 45, 90 + i * 10);
+      doc.text(String(dados.valoresCalibrado[i]), 95, 90 + i * 10);
+    }
+
+    // Status com cor
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    if (status === "Dentro") {
+      doc.setTextColor(0, 128, 0);
+    } else {
+      doc.setTextColor(200, 0, 0);
+    }
+    doc.text(`Status da Calibração: ${status}`, 10, 130);
+
+    // Linha de assinatura
+    doc.setDrawColor(0, 0, 0);
+    doc.line(10, 160, 80, 160);
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Assinatura do Técnico", 10, 165);
+
+    doc.save("laudo_calibracao.pdf");
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
     const valoresRef = dados.valoresReferencia.map(Number);
@@ -96,6 +151,7 @@ export default function RegistrarCalibracao({ username, onBack }) {
     const statusCalc = calcularStatus(valoresRef, valoresCal, tolerancia);
     setStatus(statusCalc);
     setAlerta(statusCalc === 'Fora' ? 'Atenção: Fora da tolerância!' : '');
+    gerarLaudoPDF(dados, statusCalc); // <-- Gera o PDF após o submit
   }
 
   return (
