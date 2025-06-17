@@ -3,10 +3,17 @@ import './Login.css';
 
 export default function Login({ onLogin }) {
   const [login, setLogin] = useState('');
+  const [senha, setSenha] = useState('');
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    onLogin(login);
+    // Chama o backend para autenticar
+    const resposta = await window.api.loginUsuario({ login, senha });
+    if (resposta.success) {
+      onLogin(resposta.usuario); // Passe o objeto inteiro
+    } else {
+      alert(resposta.error || "Login ou senha inválidos!");
+    }
   }
 
   return (
@@ -24,7 +31,13 @@ export default function Login({ onLogin }) {
           />
 
           <label className="login-label" htmlFor="senha">SENHA</label>
-          <input className="login-input" id="senha" type="password" />
+          <input
+            className="login-input"
+            id="senha"
+            type="password"
+            value={senha}
+            onChange={e => setSenha(e.target.value)}
+          />
 
           <div className="login-forgot">ESQUECEU A SENHA?</div>
           <button type="submit" style={{ display: 'none' }}></button>

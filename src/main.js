@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { inserirManutencao } = require('./database'); // ajuste o caminho se necessário
+const { cadastrarUsuario, autenticarUsuario } = require('./database'); // ajuste o caminho se necessário
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -25,14 +25,14 @@ app.on('window-all-closed', () => {
   }
 });
 
-// Adicione este bloco para receber requisições do frontend
-ipcMain.handle('inserir-manutencao', async (event, manutencao) => {
-  try {
-    const id = inserirManutencao(manutencao);
-    return { success: true, id };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
+// IPC para cadastro de usuário
+ipcMain.handle('cadastrar-usuario', async (event, dadosUsuario) => {
+  return cadastrarUsuario(dadosUsuario);
+});
+
+// IPC para login de usuário
+ipcMain.handle('login-usuario', async (event, dadosLogin) => {
+  return autenticarUsuario(dadosLogin);
 });
 
 ipcMain.on('sair-app', () => {

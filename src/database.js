@@ -3,12 +3,22 @@ const db = new Database('medicalib.db');
 
 // Criação das tabelas (execute uma vez)
 db.exec(`
+CREATE TABLE IF NOT EXISTS usuarios (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT,
+  login TEXT UNIQUE,
+  senha TEXT,
+  tipo TEXT
+);
+
 CREATE TABLE IF NOT EXISTS equipamentos (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   nome TEXT,
   fabricante TEXT,
   modelo TEXT,
-  numero_serie TEXT
+  numero_serie TEXT,
+  usuario_id INTEGER,
+  FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
 );
 
 CREATE TABLE IF NOT EXISTS tecnicos (
@@ -32,8 +42,10 @@ CREATE TABLE IF NOT EXISTS manutencoes (
   requer_aprovacao INTEGER,
   justificativa TEXT,
   status TEXT,
+  usuario_id INTEGER,
   FOREIGN KEY(equipamento_id) REFERENCES equipamentos(id),
-  FOREIGN KEY(tecnico_id) REFERENCES tecnicos(id)
+  FOREIGN KEY(tecnico_id) REFERENCES tecnicos(id),
+  FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
 );
 
 CREATE TABLE IF NOT EXISTS pecas (
@@ -83,4 +95,39 @@ function inserirManutencao(manutencao) {
   return info.lastInsertRowid;
 }
 
-module.exports = { db, inserirManutencao };
+// Função para cadastrar usuário (apenas admin deve poder usar)
+function cadastrarUsuario({ nome, login, senha, tipo }) {
+  const stmt = db.prepare(`
+    INSERT INTO usuarios (nome, login, senha, tipo)
+    VALUES (?, ?, ?, ?)
+  `);
+  try {
+    stmt.run(nome, login, senha, tipo);
+    return { success: true };
+  } catch (err) {
+    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      return { success: false, error: 'Login já existe.' };
+    }
+    return { success: false, error: err.message };
+  }
+}
+
+// Função para autenticar login
+function autenticarUsuario({ login, senha }) {
+  const stmt = db.prepare(`
+    SELECT id, nome, tipo FROM usuarios WHERE login = ? AND senha = ?
+  `);
+  const usuario = stmt.get(login, senha);
+  if (usuario) {
+    return { success: true, usuario };
+  } else {
+    return { success: false, error: 'Login ou senha inválidos.' };
+  }
+}
+
+module.exports = {
+  db,
+  inserirManutencao,
+  cadastrarUsuario,
+  autenticarUsuario,
+};

@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-  inserirManutencao: (manutencao) => ipcRenderer.invoke('inserir-manutencao', manutencao),
+  cadastrarUsuario: (dadosUsuario) => ipcRenderer.invoke('cadastrar-usuario', dadosUsuario),
+  loginUsuario: (dadosLogin) => ipcRenderer.invoke('login-usuario', dadosLogin),
   sair: () => ipcRenderer.send('sair-app'),
 });

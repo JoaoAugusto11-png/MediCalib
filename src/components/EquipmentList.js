@@ -1,6 +1,14 @@
 import React from 'react';
 
-export default function EquipmentList({ username, equipments, onRegisterClick, onCalibracaoClick, onAgendarManutencaoClick }) {
+export default function EquipmentList({
+  username,
+  equipments,
+  onRegisterClick,
+  onCalibracaoClick,
+  onAgendarManutencaoClick,
+  userType,
+  onCadastroUsuarioClick
+}) {
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       <div style={{
@@ -21,6 +29,11 @@ export default function EquipmentList({ username, equipments, onRegisterClick, o
           <button style={menuBtn}>LISTA DE EQUIPAMENTOS</button>
           <button style={menuBtn} onClick={onAgendarManutencaoClick}>AGENDAR MANUTENÇÃO</button>
           <button style={menuBtn} onClick={onCalibracaoClick}>REGISTRAR CALIBRAÇÃO</button>
+          {userType === 'admin' && (
+            <button style={menuBtn} onClick={onCadastroUsuarioClick}>
+              CADASTRAR NOVO USUÁRIO
+            </button>
+          )}
         </div>
         <button
           style={exitBtn}

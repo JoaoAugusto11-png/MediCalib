@@ -5,15 +5,18 @@ import EquipmentList from './components/EquipmentList';
 import RegisterEquipment from './components/RegisterEquipment';
 import RegistrarCalibracao from './components/RegistrarCalibracao';
 import AgendarManutencao from './components/AgendarManutencao';
+import CadastroUsuario from './components/CadastroUsuario';
 
 function App() {
   const [logged, setLogged] = useState(false);
   const [username, setUsername] = useState('');
+  const [userType, setUserType] = useState(''); // 'admin' ou 'usuario'
   const [tab, setTab] = useState('list');
   const [equipments, setEquipments] = useState([]);
 
-  function handleLogin(name) {
-    setUsername(name);
+  function handleLogin(usuario) {
+    setUsername(usuario.nome);
+    setUserType(usuario.tipo); // 'admin' ou 'usuario'
     setLogged(true);
   }
 
@@ -51,6 +54,14 @@ function App() {
     );
   }
 
+  if (tab === 'cadastroUsuario') {
+    return (
+      <CadastroUsuario
+        onCadastroSucesso={() => setTab('list')}
+      />
+    );
+  }
+
   return (
     <EquipmentList
       username={username}
@@ -58,10 +69,10 @@ function App() {
       onRegisterClick={() => setTab('register')}
       onCalibracaoClick={() => setTab('calibracao')}
       onAgendarManutencaoClick={() => setTab('manutencao')}
+      userType={userType}
+      onCadastroUsuarioClick={() => setTab('cadastroUsuario')}
     />
   );
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
-<button style={menuBtn} onClick={onCalibracaoClick}>REGISTRAR CALIBRAÇÃO</button>
