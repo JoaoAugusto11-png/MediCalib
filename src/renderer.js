@@ -4,6 +4,7 @@ import Login from './components/Login';
 import EquipmentList from './components/EquipmentList';
 import RegisterEquipment from './components/RegisterEquipment';
 import RegistrarCalibracao from './components/RegistrarCalibracao';
+import AgendarManutencao from './components/AgendarManutencao';
 
 function App() {
   const [logged, setLogged] = useState(false);
@@ -42,12 +43,21 @@ function App() {
     );
   }
 
+  if (tab === 'manutencao') {
+    return (
+      <AgendarManutencao
+        onBack={() => setTab('list')}
+      />
+    );
+  }
+
   return (
     <EquipmentList
       username={username}
       equipments={equipments}
       onRegisterClick={() => setTab('register')}
       onCalibracaoClick={() => setTab('calibracao')}
+      onAgendarManutencaoClick={() => setTab('manutencao')}
     />
   );
 }
