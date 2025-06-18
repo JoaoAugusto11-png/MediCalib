@@ -24,7 +24,7 @@ export default function RegisterEquipment({ username, userId, onBack, onRegister
         nome,
         fabricante,
         modelo,
-        numero_serie,
+        numero_serie: numeroSerie, // converte para o nome do banco
         usuario_id: userId
       });
       onRegister();

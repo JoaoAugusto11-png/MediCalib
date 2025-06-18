@@ -64,7 +64,7 @@ export default function EquipmentList({
                 <td style={td}>{eq.nome}</td>
                 <td style={td}>{eq.fabricante}</td>
                 <td style={td}>{eq.modelo}</td>
-                <td style={td}>{eq.numeroSerie}</td>
+                <td style={td}>{eq.numero_serie}</td>
               </tr>
             ))}
           </tbody>
