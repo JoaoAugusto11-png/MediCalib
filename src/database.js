@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
   nome TEXT,
   login TEXT UNIQUE,
   senha TEXT,
-  tipo TEXT
+  tipo TEXT,
+  empresa TEXT
 );
 
 CREATE TABLE IF NOT EXISTS equipamentos (
@@ -96,13 +97,13 @@ function inserirManutencao(manutencao) {
 }
 
 // Função para cadastrar usuário (apenas admin deve poder usar)
-function cadastrarUsuario({ nome, login, senha, tipo }) {
+function cadastrarUsuario({ nome, login, senha, tipo, empresa }) {
   const stmt = db.prepare(`
-    INSERT INTO usuarios (nome, login, senha, tipo)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO usuarios (nome, login, senha, tipo, empresa)
+    VALUES (?, ?, ?, ?, ?)
   `);
   try {
-    stmt.run(nome, login, senha, tipo);
+    stmt.run(nome, login, senha, tipo, empresa);
     return { success: true };
   } catch (err) {
     if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
@@ -125,9 +126,25 @@ function autenticarUsuario({ login, senha }) {
   }
 }
 
+function cadastrarEquipamento({ nome, fabricante, modelo, numero_serie, usuario_id }) {
+  const stmt = db.prepare(`
+    INSERT INTO equipamentos (nome, fabricante, modelo, numero_serie, usuario_id)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+  stmt.run(nome, fabricante, modelo, numero_serie, usuario_id);
+  return { success: true };
+}
+
+function listarEquipamentosPorUsuario(usuario_id) {
+  const stmt = db.prepare('SELECT * FROM equipamentos WHERE usuario_id = ?');
+  return stmt.all(usuario_id);
+}
+
 module.exports = {
   db,
   inserirManutencao,
   cadastrarUsuario,
   autenticarUsuario,
+  cadastrarEquipamento,
+  listarEquipamentosPorUsuario,
 };

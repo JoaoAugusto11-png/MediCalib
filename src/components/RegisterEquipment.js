@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function RegisterEquipment({ username, onBack, onRegister }) {
+export default function RegisterEquipment({ username, userId, onBack, onRegister }) {
   const [form, setForm] = useState({
     nome: '',
     fabricante: '',
@@ -12,10 +12,30 @@ export default function RegisterEquipment({ username, onBack, onRegister }) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    onRegister(form);
-    setForm({ nome: '', fabricante: '', modelo: '', numeroSerie: '' });
+    try {
+      const { nome, fabricante, modelo, numeroSerie: numero_serie } = form;
+      if (!userId) {
+        alert('Erro: usuário não identificado!');
+        return;
+      }
+      await window.api.cadastrarEquipamento({
+        nome,
+        fabricante,
+        modelo,
+        numero_serie,
+        usuario_id: userId
+      });
+      onRegister();
+    } catch (err) {
+      alert('Erro ao cadastrar equipamento: ' + err.message);
+    }
+  }
+
+  function handleLogin(usuario) {
+    setUserId(usuario.id);
+    // ...
   }
 
   return (
@@ -31,7 +51,7 @@ export default function RegisterEquipment({ username, onBack, onRegister }) {
         <div>
           <h1 style={{ fontFamily: 'Oswald', fontSize: 32, marginBottom: 32 }}>MEDICALIB</h1>
           <div style={{ marginBottom: 32 }}>
-            <div style={{ fontWeight: 'bold', fontSize: 18 }}>{username.toUpperCase()}</div>
+            <div style={{ fontWeight: 'bold', fontSize: 18 }}>{username ? username.toUpperCase() : ''}</div>
             <div style={{ fontSize: 14 }}>ESTAGIÁRIO (EMPRESA X)</div>
           </div>
           <button style={menuBtn} onClick={onBack}>LISTA DE EQUIPAMENTOS</button>

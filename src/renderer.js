@@ -11,17 +11,24 @@ function App() {
   const [logged, setLogged] = useState(false);
   const [username, setUsername] = useState('');
   const [userType, setUserType] = useState(''); // 'admin' ou 'usuario'
+  const [userId, setUserId] = useState(null); // <-- Adicionado
   const [tab, setTab] = useState('list');
   const [equipments, setEquipments] = useState([]);
 
-  function handleLogin(usuario) {
+  async function handleLogin(usuario) {
     setUsername(usuario.nome);
-    setUserType(usuario.tipo); // 'admin' ou 'usuario'
+    setUserType(usuario.tipo);
+    setUserId(usuario.id);
     setLogged(true);
+
+    // Busque os equipamentos do usuário logado
+    const equipamentos = await window.api.listarEquipamentosUsuario(usuario.id);
+    setEquipments(equipamentos);
   }
 
-  function handleRegister(equipment) {
-    setEquipments([...equipments, equipment]);
+  async function handleRegister() {
+    const equipamentos = await window.api.listarEquipamentosUsuario(userId);
+    setEquipments(equipamentos);
     setTab('list');
   }
 
@@ -30,9 +37,9 @@ function App() {
   if (tab === 'register') {
     return (
       <RegisterEquipment
-        username={username}
-        onBack={() => setTab('list')}
+        userId={userId}
         onRegister={handleRegister}
+        onBack={() => setTab('list')}
       />
     );
   }
@@ -58,6 +65,7 @@ function App() {
     return (
       <CadastroUsuario
         onCadastroSucesso={() => setTab('list')}
+        onBack={() => setTab('list')}
       />
     );
   }
@@ -76,3 +84,9 @@ function App() {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
+
+{onBack && (
+  <button type="button" onClick={onBack} style={{ marginBottom: 16 }}>
+    ⟵ Voltar
+  </button>
+)}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function CadastroUsuario({ onCadastroSucesso }) {
+export default function CadastroUsuario({ onCadastroSucesso, onBack }) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -9,27 +9,40 @@ export default function CadastroUsuario({ onCadastroSucesso }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const resposta = await window.api.cadastrarUsuario({
+    // Supondo que você tem o usuário logado em userId
+    await window.api.cadastrarUsuario({
       nome,
-      login: email,
+      login: nome, // aqui salva o nome como login
       senha,
       tipo: 'usuario',
-      empresa
+      empresa,
+      email // se quiser manter o e-mail separado (adicione o campo na tabela se for usar)
     });
-    if (resposta.success) {
-      setMensagem('Usuário cadastrado com sucesso!');
-      setNome('');
-      setEmail('');
-      setSenha('');
-      setEmpresa('');
-      if (onCadastroSucesso) onCadastroSucesso();
-    } else {
-      setMensagem(resposta.error || 'Erro ao cadastrar usuário.');
-    }
+    setMensagem('Usuário cadastrado com sucesso!');
+    setNome('');
+    setEmail('');
+    setSenha('');
+    setEmpresa('');
+    if (onCadastroSucesso) onCadastroSucesso();
   }
 
   return (
     <div style={{ maxWidth: 400, margin: '40px auto', background: '#f7fbff', padding: 32, borderRadius: 8 }}>
+      {onBack && (
+        <button type="button" onClick={onBack} style={{
+          marginBottom: 16,
+          background: '#b3d7f7',
+          border: '1px solid #222',
+          borderRadius: 4,
+          fontFamily: 'Oswald',
+          fontWeight: 'bold',
+          fontSize: 16,
+          padding: '8px 0',
+          cursor: 'pointer'
+        }}>
+          ⟵ Voltar
+        </button>
+      )}
       <h2 style={{ fontFamily: 'Oswald', fontSize: 28, marginBottom: 24 }}>Cadastro de Técnico</h2>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <label style={{ fontWeight: 'bold' }}>
@@ -85,30 +98,8 @@ export default function CadastroUsuario({ onCadastroSucesso }) {
         }}>
           Cadastrar
         </button>
-        {mensagem && <div style={{ marginTop: 12, color: resposta?.success ? 'green' : 'red' }}>{mensagem}</div>}
+        {mensagem && <div style={{ marginTop: 12, color: mensagem.includes('sucesso') ? 'green' : 'red' }}>{mensagem}</div>}
       </form>
-      <div style={{ background: '#94c8f7', width: 320, padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
-        <div>
-          <h1 style={{ fontFamily: 'Oswald', fontSize: 32, marginBottom: 32 }}>MEDICALIB</h1>
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ fontWeight: 'bold', fontSize: 18 }}>{username?.toUpperCase()}</div>
-            <div style={{ fontSize: 14 }}>{userType === 'admin' ? 'ADMINISTRADOR' : 'ESTAGIÁRIO'} (EMPRESA X)</div>
-          </div>
-          <button style={menuBtn} onClick={() => setTab('register')}>REGISTRAR EQUIPAMENTO</button>
-          <button style={menuBtn} onClick={() => setTab('list')}>LISTA DE EQUIPAMENTOS</button>
-          <button style={menuBtn} onClick={() => setTab('manutencao')}>AGENDAR MANUTENÇÃO</button>
-          <button style={menuBtn} onClick={() => setTab('calibracao')}>REGISTRAR CALIBRAÇÃO</button>
-          {/* Adicione aqui o botão de cadastro de usuário, só para admin */}
-          {userType === 'admin' && (
-            <button style={menuBtn} onClick={() => setTab('cadastroUsuario')}>
-              CADASTRAR NOVO USUÁRIO
-            </button>
-          )}
-        </div>
-        <button style={{ ...submitBtn, background: '#f7c8c8', color: '#222' }} onClick={() => window.api.sair()}>
-          ← SAIR
-        </button>
-      </div>
     </div>
   );
 }
