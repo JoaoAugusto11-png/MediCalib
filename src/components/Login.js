@@ -42,9 +42,7 @@ export default function Login({ onLogin }) {
           <div className="login-forgot">ESQUECEU A SENHA?</div>
           <button type="submit" style={{ display: 'none' }}></button>
         </form>
-        <div className="login-footer">
-          AINDA NÃO TEM LOGIN? <span className="login-register">CADASTRE-SE</span>
-        </div>
+        {/* Removido o rodapé de cadastro */}
       </div>
     </div>
   );

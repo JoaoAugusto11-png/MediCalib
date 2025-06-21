@@ -7,7 +7,8 @@ export default function EquipmentList({
   onCalibracaoClick,
   onAgendarManutencaoClick,
   userType,
-  onCadastroUsuarioClick
+  onCadastroUsuarioClick,
+  empresa // <-- Receba a empresa como prop
 }) {
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
@@ -23,7 +24,10 @@ export default function EquipmentList({
           <h1 style={{ fontFamily: 'Oswald', fontSize: 32, marginBottom: 32 }}>MEDICALIB</h1>
           <div style={{ marginBottom: 32 }}>
             <div style={{ fontWeight: 'bold', fontSize: 18 }}>{username ? username.toUpperCase() : ''}</div>
-            <div style={{ fontSize: 14 }}>ESTAGIÁRIO (EMPRESA X)</div>
+            <div style={{ fontSize: 14 }}>
+              {userType === 'admin' ? 'ADMINISTRADOR' : 'TÉCNICO'}
+              {empresa && ` - ${empresa.toUpperCase()}`}
+            </div>
           </div>
           <button style={menuBtn} onClick={onRegisterClick}>REGISTRAR EQUIPAMENTO</button>
           <button style={menuBtn}>LISTA DE EQUIPAMENTOS</button>

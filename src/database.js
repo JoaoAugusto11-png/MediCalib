@@ -116,7 +116,7 @@ function cadastrarUsuario({ nome, login, senha, tipo, empresa }) {
 // Função para autenticar login
 function autenticarUsuario({ login, senha }) {
   const stmt = db.prepare(`
-    SELECT id, nome, tipo FROM usuarios WHERE login = ? AND senha = ?
+    SELECT id, nome, tipo, empresa FROM usuarios WHERE login = ? AND senha = ?
   `);
   const usuario = stmt.get(login, senha);
   if (usuario) {

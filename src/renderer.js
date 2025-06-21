@@ -11,13 +11,15 @@ function App() {
   const [logged, setLogged] = useState(false);
   const [username, setUsername] = useState('');
   const [userType, setUserType] = useState(''); // 'admin' ou 'usuario'
-  const [userId, setUserId] = useState(null); // <-- Adicionado
+  const [empresa, setEmpresa] = useState('');   // <-- Adicionado
+  const [userId, setUserId] = useState(null);
   const [tab, setTab] = useState('list');
   const [equipments, setEquipments] = useState([]);
 
   async function handleLogin(usuario) {
     setUsername(usuario.nome);
     setUserType(usuario.tipo);
+    setEmpresa(usuario.empresa || ''); // <-- Salva a empresa do usuário
     setUserId(usuario.id);
     setLogged(true);
 
@@ -73,11 +75,12 @@ function App() {
   return (
     <EquipmentList
       username={username}
+      userType={userType}
+      empresa={empresa} // <-- Passe a empresa para o menu lateral
       equipments={equipments}
       onRegisterClick={() => setTab('register')}
       onCalibracaoClick={() => setTab('calibracao')}
       onAgendarManutencaoClick={() => setTab('manutencao')}
-      userType={userType}
       onCadastroUsuarioClick={() => setTab('cadastroUsuario')}
     />
   );
