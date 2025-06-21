@@ -140,6 +140,24 @@ function listarEquipamentosPorUsuario(usuario_id) {
   return stmt.all(usuario_id);
 }
 
+// Excluir equipamento
+function excluirEquipamento(id) {
+  const stmt = db.prepare('DELETE FROM equipamentos WHERE id = ?');
+  stmt.run(id);
+  return { success: true };
+}
+
+// Editar equipamento
+function editarEquipamento({ id, nome, fabricante, modelo, numero_serie }) {
+  const stmt = db.prepare(`
+    UPDATE equipamentos
+    SET nome = ?, fabricante = ?, modelo = ?, numero_serie = ?
+    WHERE id = ?
+  `);
+  stmt.run(nome, fabricante, modelo, numero_serie, id);
+  return { success: true };
+}
+
 module.exports = {
   db,
   inserirManutencao,
@@ -147,4 +165,6 @@ module.exports = {
   autenticarUsuario,
   cadastrarEquipamento,
   listarEquipamentosPorUsuario,
+  excluirEquipamento,
+  editarEquipamento,
 };

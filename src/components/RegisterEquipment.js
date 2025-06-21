@@ -15,7 +15,7 @@ export default function RegisterEquipment({ username, userId, onBack, onRegister
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const { nome, fabricante, modelo, numeroSerie: numero_serie } = form;
+      const { nome, fabricante, modelo, numeroSerie } = form;
       if (!userId) {
         alert('Erro: usuário não identificado!');
         return;
@@ -31,11 +31,6 @@ export default function RegisterEquipment({ username, userId, onBack, onRegister
     } catch (err) {
       alert('Erro ao cadastrar equipamento: ' + err.message);
     }
-  }
-
-  function handleLogin(usuario) {
-    setUserId(usuario.id);
-    // ...
   }
 
   return (
@@ -56,7 +51,7 @@ export default function RegisterEquipment({ username, userId, onBack, onRegister
           </div>
           <button style={menuBtn} onClick={onBack}>LISTA DE EQUIPAMENTOS</button>
         </div>
-        <button style={exitBtn}>⟵ SAIR</button>
+        <button style={exitBtn} onClick={() => window.api.sair()}>⟵ SAIR</button>
       </div>
       <div style={{ flex: 1, padding: 32 }}>
         <h1 style={{ fontFamily: 'Oswald', fontSize: 36, textAlign: 'center' }}>REGISTRAR EQUIPAMENTO</h1>

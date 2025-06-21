@@ -6,4 +6,6 @@ contextBridge.exposeInMainWorld('api', {
   sair: () => ipcRenderer.send('sair-app'),
   cadastrarEquipamento: (dados) => ipcRenderer.invoke('cadastrar-equipamento', dados),
   listarEquipamentosUsuario: (usuario_id) => ipcRenderer.invoke('listar-equipamentos-usuario', usuario_id),
+  excluirEquipamento: (id) => ipcRenderer.invoke('excluir-equipamento', id),
+  editarEquipamento: (dados) => ipcRenderer.invoke('editar-equipamento', dados),
 });

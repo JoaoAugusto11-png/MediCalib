@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function EquipmentList({
   username,
@@ -8,8 +8,42 @@ export default function EquipmentList({
   onAgendarManutencaoClick,
   userType,
   onCadastroUsuarioClick,
-  empresa // <-- Receba a empresa como prop
+  empresa,
+  onDelete,
+  onUpdate // nova prop para atualizar a lista após edição
 }) {
+  const [editId, setEditId] = useState(null);
+  const [editForm, setEditForm] = useState({
+    nome: '',
+    fabricante: '',
+    modelo: '',
+    numero_serie: ''
+  });
+
+  function startEdit(eq) {
+    setEditId(eq.id);
+    setEditForm({
+      nome: eq.nome,
+      fabricante: eq.fabricante,
+      modelo: eq.modelo,
+      numero_serie: eq.numero_serie
+    });
+  }
+
+  function handleEditChange(e) {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  }
+
+  async function saveEdit(id) {
+    await window.api.editarEquipamento({ id, ...editForm });
+    setEditId(null);
+    if (onUpdate) onUpdate(); // Atualiza a lista sem recarregar
+  }
+
+  function cancelEdit() {
+    setEditId(null);
+  }
+
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       <div style={{
@@ -55,20 +89,44 @@ export default function EquipmentList({
               <th style={th}>Fabricante</th>
               <th style={th}>Modelo</th>
               <th style={th}>Nº de Série</th>
+              <th style={th}>Ações</th>
             </tr>
           </thead>
           <tbody>
             {equipments.length === 0 && (
               <tr>
-                <td colSpan={4} style={{ textAlign: 'center', padding: 16 }}>Nenhum equipamento cadastrado.</td>
+                <td colSpan={5} style={{ textAlign: 'center', padding: 16 }}>Nenhum equipamento cadastrado.</td>
               </tr>
             )}
-            {equipments.map((eq, idx) => (
-              <tr key={idx}>
-                <td style={td}>{eq.nome}</td>
-                <td style={td}>{eq.fabricante}</td>
-                <td style={td}>{eq.modelo}</td>
-                <td style={td}>{eq.numero_serie}</td>
+            {equipments.map((eq) => (
+              <tr key={eq.id}>
+                {editId === eq.id ? (
+                  <>
+                    <td style={td}><input name="nome" value={editForm.nome} onChange={handleEditChange} /></td>
+                    <td style={td}><input name="fabricante" value={editForm.fabricante} onChange={handleEditChange} /></td>
+                    <td style={td}><input name="modelo" value={editForm.modelo} onChange={handleEditChange} /></td>
+                    <td style={td}><input name="numero_serie" value={editForm.numero_serie} onChange={handleEditChange} /></td>
+                    <td style={td}>
+                      <button onClick={async () => {
+                        await window.api.editarEquipamento({ id: eq.id, ...editForm });
+                        setEditId(null);
+                        if (onUpdate) await onUpdate(); // <-- Chame a função de atualização aqui!
+                      }}>Salvar</button>
+                      <button onClick={cancelEdit}>Cancelar</button>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td style={td}>{eq.nome}</td>
+                    <td style={td}>{eq.fabricante}</td>
+                    <td style={td}>{eq.modelo}</td>
+                    <td style={td}>{eq.numero_serie}</td>
+                    <td style={td}>
+                      <button onClick={() => startEdit(eq)}>Editar</button>
+                      <button onClick={() => onDelete(eq.id)}>Excluir</button>
+                    </td>
+                  </>
+                )}
               </tr>
             ))}
           </tbody>

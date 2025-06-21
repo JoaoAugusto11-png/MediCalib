@@ -15,6 +15,7 @@ function App() {
   const [userId, setUserId] = useState(null);
   const [tab, setTab] = useState('list');
   const [equipments, setEquipments] = useState([]);
+  const [editingEquipamento, setEditingEquipamento] = useState(null);
 
   async function handleLogin(usuario) {
     setUsername(usuario.nome);
@@ -32,6 +33,21 @@ function App() {
     const equipamentos = await window.api.listarEquipamentosUsuario(userId);
     setEquipments(equipamentos);
     setTab('list');
+  }
+
+  async function atualizarEquipamentos() {
+    const equipamentos = await window.api.listarEquipamentosUsuario(userId);
+    setEquipments(equipamentos);
+  }
+
+  async function handleDeleteEquipamento(id) {
+    await window.api.excluirEquipamento(id);
+    await atualizarEquipamentos();
+  }
+
+  async function handleEditEquipamento(equipamentoEditado) {
+    await window.api.editarEquipamento(equipamentoEditado);
+    await atualizarEquipamentos();
   }
 
   if (!logged) return <Login onLogin={handleLogin} />;
@@ -82,6 +98,8 @@ function App() {
       onCalibracaoClick={() => setTab('calibracao')}
       onAgendarManutencaoClick={() => setTab('manutencao')}
       onCadastroUsuarioClick={() => setTab('cadastroUsuario')}
+      onDelete={handleDeleteEquipamento}
+      onUpdate={atualizarEquipamentos}
     />
   );
 }
