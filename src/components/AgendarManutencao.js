@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import RegisterEquipment from "./RegisterEquipment"; // Certifique-se de que o caminho está correto
 
 const inputStyle = {
   width: '100%',
@@ -30,7 +31,7 @@ const submitBtn = {
   marginTop: 16
 };
 
-export default function AgendarManutencao({ onBack }) {
+export default function AgendarManutencao({ onBack, username, userType, empresa, userId, onRegister }) {
   const [form, setForm] = useState({
     equipamento: "",
     tipo: "",
@@ -46,6 +47,8 @@ export default function AgendarManutencao({ onBack }) {
     justificativa: "",
     status: "Agendada"
   });
+
+  const [tab, setTab] = useState('agendar'); // Estado para controlar a aba atual
 
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
@@ -84,6 +87,25 @@ export default function AgendarManutencao({ onBack }) {
     }
   };
 
+  const handleRegister = () => {
+    // Lógica para lidar com o registro do equipamento
+    alert("Equipamento registrado com sucesso!"); // Exemplo de ação após registro
+    setTab('agendar'); // Volta para a aba de agendar manutenção
+  };
+
+  if (tab === 'register') {
+    return (
+      <RegisterEquipment
+        username={username}
+        userType={userType}
+        empresa={empresa}
+        userId={userId}
+        onRegister={handleRegister}
+        onBack={() => setTab('list')}
+      />
+    );
+  }
+
   return (
     <div style={{ display: 'flex', height: '100vh', alignItems: 'stretch' }}>
       <div style={{
@@ -96,6 +118,12 @@ export default function AgendarManutencao({ onBack }) {
         height: '100%'
       }}>
         <h1 style={{ fontFamily: 'Oswald', fontSize: 32, marginBottom: 32 }}>MEDICALIB</h1>
+        <div style={{ fontWeight: 'bold', fontSize: 18 }}>
+          {username ? username.toUpperCase() : ''}
+        </div>
+        <div style={{ fontSize: 14 }}>
+          {userType ? userType.toUpperCase() : ''}{empresa ? ` (${empresa})` : ''}
+        </div>
         <button
           style={{
             ...submitBtn,
