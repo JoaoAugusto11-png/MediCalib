@@ -10,7 +10,8 @@ export default function EquipmentList({
   onCadastroUsuarioClick,
   empresa,
   onDelete,
-  onUpdate // nova prop para atualizar a lista após edição
+  onUpdate,
+  onLogout // <-- adicione aqui
 }) {
   const [editId, setEditId] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -75,7 +76,7 @@ export default function EquipmentList({
         </div>
         <button
           style={exitBtn}
-          onClick={() => window.api.sair()}
+          onClick={onLogout}
         >
           ← SAIR
         </button>

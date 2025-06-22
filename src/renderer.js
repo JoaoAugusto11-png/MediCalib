@@ -63,6 +63,16 @@ function App() {
     setLoginKey(prev => prev + 1); // Força remontagem
   }
 
+  function handleLogout() {
+    setLogged(false);
+    setUsername('');
+    setUserType('');
+    setEmpresa('');
+    setUserId('');
+    setEquipments([]);
+    // Se tiver outros estados do usuário, limpe aqui também
+  }
+
   if (!logged) {
     if (showRecuperarSenha) {
       return (
@@ -134,6 +144,7 @@ function App() {
       onCadastroUsuarioClick={() => setTab('cadastroUsuario')}
       onDelete={handleDeleteEquipamento}
       onUpdate={atualizarEquipamentos}
+      onLogout={handleLogout}
     />
   );
 }
