@@ -34,29 +34,147 @@ export default function RecuperarSenha({ onLoginDireto, onVoltar }) {
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: '40px auto' }}>
-      <h2>Recuperar Senha</h2>
-      {etapa === 1 && (
-        <form onSubmit={handleValidarToken}>
-          <label>Login:</label>
-          <input value={login} onChange={e => setLogin(e.target.value)} required />
-          <label>Token de acesso:</label>
-          <input value={token} onChange={e => setToken(e.target.value)} required />
-          <button type="submit" disabled={loading}>
-            {loading ? 'Validando...' : 'Validar Token'}
-          </button>
-        </form>
-      )}
-      {etapa === 2 && (
-        <form onSubmit={handleRedefinirSenha}>
-          <label>Nova Senha:</label>
-          <input type="password" value={novaSenha} onChange={e => setNovaSenha(e.target.value)} required />
-          <button type="submit" disabled={loading}>
-            {loading ? 'Redefinindo...' : 'Redefinir Senha'}
-          </button>
-        </form>
-      )}
-      <button onClick={onVoltar} style={{ marginTop: 16 }} disabled={loading}>Voltar</button>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#e6f2fb'
+    }}>
+      <div style={{
+        background: '#b3d7f7',
+        padding: 32,
+        borderRadius: 24,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+        minWidth: 380,
+        maxWidth: 420,
+        width: '100%'
+      }}>
+        <h2 style={{
+          fontFamily: 'Oswald',
+          fontSize: 28,
+          textAlign: 'center',
+          marginBottom: 24,
+          letterSpacing: 1
+        }}>
+          Recuperar Senha
+        </h2>
+        {etapa === 1 && (
+          <form onSubmit={handleValidarToken} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <label style={{ fontWeight: 'bold', fontSize: 16 }}>
+              Login:
+              <input
+                style={{
+                  width: '100%',
+                  padding: 10,
+                  borderRadius: 8,
+                  border: '1px solid #8bbbe8',
+                  marginTop: 4,
+                  fontSize: 16
+                }}
+                value={login}
+                onChange={e => setLogin(e.target.value)}
+                required
+                autoFocus
+              />
+            </label>
+            <label style={{ fontWeight: 'bold', fontSize: 16 }}>
+              Token de acesso:
+              <input
+                style={{
+                  width: '100%',
+                  padding: 10,
+                  borderRadius: 8,
+                  border: '1px solid #8bbbe8',
+                  marginTop: 4,
+                  fontSize: 16
+                }}
+                value={token}
+                onChange={e => setToken(e.target.value)}
+                required
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                marginTop: 8,
+                padding: '12px 0',
+                background: '#0074d9',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                fontFamily: 'Oswald',
+                fontSize: 18,
+                fontWeight: 'bold',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'background 0.2s'
+              }}
+            >
+              {loading ? 'Validando...' : 'Validar Token'}
+            </button>
+          </form>
+        )}
+        {etapa === 2 && (
+          <form onSubmit={handleRedefinirSenha} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <label style={{ fontWeight: 'bold', fontSize: 16 }}>
+              Nova Senha:
+              <input
+                type="password"
+                style={{
+                  width: '100%',
+                  padding: 10,
+                  borderRadius: 8,
+                  border: '1px solid #8bbbe8',
+                  marginTop: 4,
+                  fontSize: 16
+                }}
+                value={novaSenha}
+                onChange={e => setNovaSenha(e.target.value)}
+                required
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                marginTop: 8,
+                padding: '12px 0',
+                background: '#0074d9',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                fontFamily: 'Oswald',
+                fontSize: 18,
+                fontWeight: 'bold',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'background 0.2s'
+              }}
+            >
+              {loading ? 'Redefinindo...' : 'Redefinir Senha'}
+            </button>
+          </form>
+        )}
+        <button
+          onClick={onVoltar}
+          style={{
+            marginTop: 24,
+            width: '100%',
+            padding: '10px 0',
+            background: '#e0e7ef',
+            color: '#222',
+            border: '1px solid #8bbbe8',
+            borderRadius: 8,
+            fontFamily: 'Oswald',
+            fontWeight: 'bold',
+            fontSize: 16,
+            cursor: 'pointer'
+          }}
+          disabled={loading}
+        >
+          Voltar
+        </button>
+      </div>
     </div>
   );
 }
