@@ -1,64 +1,9 @@
 import React, { useState } from 'react';
-import jsPDF from "jspdf";
 
-function calcularStatus(valoresReferencia, valoresCalibrado, tolerancia) {
-  for (let i = 0; i < 3; i++) {
-    const dif = Math.abs(valoresReferencia[i] - valoresCalibrado[i]);
-    if (dif > tolerancia) return 'Fora';
-  }
-  return 'Dentro';
-}
-
-const inputStyle = {
-  width: '100%',
-  padding: '8px',
-  fontSize: 16,
-  border: '1px solid #bbb',
-  borderRadius: 4,
-  marginTop: 4,
-  marginBottom: 8,
-  fontFamily: 'Oswald'
-};
-
-const labelStyle = {
-  fontWeight: 'bold',
-  fontFamily: 'Oswald',
-  fontSize: 18,
-  marginBottom: 4
-};
-
-const blocoStyle = {
-  display: 'flex',
-  gap: 16,
-  marginTop: 8,
-  marginBottom: 8
-};
-
-const submitBtn = {
-  padding: '12px 0',
-  background: '#94c8f7',
-  border: '1px solid #222',
-  fontFamily: 'Oswald',
-  fontSize: 18,
-  fontWeight: 'bold',
-  borderRadius: 4,
-  cursor: 'pointer',
-  marginTop: 16
-};
-
-// CSS para remover as setas dos inputs type="number"
-const noSpinnerStyle = `
-  input[type=number]::-webkit-inner-spin-button, 
-  input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  input[type=number] {
-    -moz-appearance: textfield;
-  }
-`;
-
-export default function RegistrarCalibracao({ username, userType, empresa, userId, onBack, onRegister }) {
+export default function RegistrarCalibracao({
+  username, userType, empresa, userId, equipamentos = [], onBack, onRegister
+}) {
+  const [equipamentoId, setEquipamentoId] = useState('');
   const [dados, setDados] = useState({
     data: '',
     temperatura: '',
@@ -71,6 +16,7 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
 
   const [status, setStatus] = useState('');
   const [alerta, setAlerta] = useState('');
+  const hasEquipamentos = equipamentos && equipamentos.length > 0;
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -87,6 +33,14 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
     } else {
       setDados({ ...dados, [name]: value });
     }
+  }
+
+  function calcularStatus(valoresReferencia, valoresCalibrado, tolerancia) {
+    for (let i = 0; i < 3; i++) {
+      const dif = Math.abs(valoresReferencia[i] - valoresCalibrado[i]);
+      if (dif > tolerancia) return 'Fora';
+    }
+    return 'Dentro';
   }
 
   function gerarLaudoPDF(dados, status) {
@@ -145,6 +99,7 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (!hasEquipamentos) return;
     const valoresRef = dados.valoresReferencia.map(Number);
     const valoresCal = dados.valoresCalibrado.map(Number);
     const tolerancia = parseFloat(dados.tolerancia);
@@ -152,52 +107,37 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
     setStatus(statusCalc);
     setAlerta(statusCalc === 'Fora' ? 'Atenção: Fora da tolerância!' : '');
     gerarLaudoPDF(dados, statusCalc); // <-- Gera o PDF após o submit
+    onRegister({ equipamentoId, ...dados });
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', alignItems: 'stretch' }}>
-      {/* Adiciona o estilo global para remover os spinners */}
-      <style>{noSpinnerStyle}</style>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#e6f2fb'
+    }}>
       <div style={{
-        background: '#94c8f7',
-        width: 320,
-        padding: 24,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        height: '100%' // <-- Garante que a lateral azul vá até o fim
+        background: '#b3d7f7',
+        padding: 32,
+        borderRadius: 24,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+        minWidth: 380,
+        maxWidth: 420,
+        width: '100%'
       }}>
-        <div>
-          <h1 style={{ fontFamily: 'Oswald', fontSize: 32, marginBottom: 32 }}>MEDICALIB</h1>
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ fontWeight: 'bold', fontSize: 18 }}>
-              {username ? username.toUpperCase() : ''}
-            </div>
-            <div style={{ fontSize: 14 }}>
-              {userType ? userType.toUpperCase() : ''}{empresa ? ` (${empresa})` : ''}
-            </div>
-          </div>
-          <button
-            style={{
-              ...submitBtn,
-              width: '100%',
-              marginTop: 0,
-              marginBottom: 16,
-              background: '#b3d7f7', // <-- azul claro igual ao da imagem
-              color: '#222',
-              position: 'relative',
-              zIndex: 1
-            }}
-            onClick={onBack}
-          >
-            ⟵ VOLTAR
-          </button>
-        </div>
-      </div>
-      <div style={{ flex: 1, padding: 32 }}>
-        <h1 style={{ fontFamily: 'Oswald', fontSize: 36, textAlign: 'center' }}>REGISTRAR CALIBRAÇÃO</h1>
-        <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: '40px auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <label style={labelStyle}>
+        <h2 style={{
+          fontFamily: 'Oswald',
+          fontSize: 28,
+          textAlign: 'center',
+          marginBottom: 24,
+          letterSpacing: 1
+        }}>
+          Registrar Calibração
+        </h2>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <label style={{ fontWeight: 'bold', fontSize: 16 }}>
             Data:
             <input
               type="date"
@@ -205,10 +145,17 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
               value={dados.data}
               onChange={handleChange}
               required
-              style={inputStyle}
+              style={{
+                width: '100%',
+                padding: 10,
+                borderRadius: 8,
+                border: '1px solid #8bbbe8',
+                marginTop: 4,
+                fontSize: 16
+              }}
             />
           </label>
-          <label style={labelStyle}>
+          <label style={{ fontWeight: 'bold', fontSize: 16 }}>
             Temperatura (°C):
             <input
               type="number"
@@ -216,10 +163,17 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
               value={dados.temperatura}
               onChange={handleChange}
               required
-              style={inputStyle}
+              style={{
+                width: '100%',
+                padding: 10,
+                borderRadius: 8,
+                border: '1px solid #8bbbe8',
+                marginTop: 4,
+                fontSize: 16
+              }}
             />
           </label>
-          <label style={labelStyle}>
+          <label style={{ fontWeight: 'bold', fontSize: 16 }}>
             Umidade (%):
             <input
               type="number"
@@ -227,10 +181,17 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
               value={dados.umidade}
               onChange={handleChange}
               required
-              style={inputStyle}
+              style={{
+                width: '100%',
+                padding: 10,
+                borderRadius: 8,
+                border: '1px solid #8bbbe8',
+                marginTop: 4,
+                fontSize: 16
+              }}
             />
           </label>
-          <label style={labelStyle}>
+          <label style={{ fontWeight: 'bold', fontSize: 16 }}>
             Técnico Responsável:
             <input
               type="text"
@@ -238,12 +199,24 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
               value={dados.tecnico}
               onChange={handleChange}
               required
-              style={inputStyle}
+              style={{
+                width: '100%',
+                padding: 10,
+                borderRadius: 8,
+                border: '1px solid #8bbbe8',
+                marginTop: 4,
+                fontSize: 16
+              }}
             />
           </label>
           <div>
-            <div style={labelStyle}>Valores de Referência:</div>
-            <div style={blocoStyle}>
+            <div style={{ fontWeight: 'bold', fontSize: 16 }}>Valores de Referência:</div>
+            <div style={{
+              display: 'flex',
+              gap: 16,
+              marginTop: 8,
+              marginBottom: 8
+            }}>
               {[0, 1, 2].map(i => (
                 <input
                   key={i}
@@ -253,14 +226,26 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
                   onChange={handleChange}
                   required
                   placeholder={`Valor ${i + 1}`}
-                  style={{ ...inputStyle, width: 100, margin: 0 }}
+                  style={{
+                    width: 100,
+                    padding: 10,
+                    borderRadius: 8,
+                    border: '1px solid #8bbbe8',
+                    fontSize: 16,
+                    margin: 0
+                  }}
                 />
               ))}
             </div>
           </div>
           <div>
-            <div style={labelStyle}>Valores Calibrados:</div>
-            <div style={blocoStyle}>
+            <div style={{ fontWeight: 'bold', fontSize: 16 }}>Valores Calibrados:</div>
+            <div style={{
+              display: 'flex',
+              gap: 16,
+              marginTop: 8,
+              marginBottom: 8
+            }}>
               {[0, 1, 2].map(i => (
                 <input
                   key={i}
@@ -270,12 +255,19 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
                   onChange={handleChange}
                   required
                   placeholder={`Valor ${i + 1}`}
-                  style={{ ...inputStyle, width: 100, margin: 0 }}
+                  style={{
+                    width: 100,
+                    padding: 10,
+                    borderRadius: 8,
+                    border: '1px solid #8bbbe8',
+                    fontSize: 16,
+                    margin: 0
+                  }}
                 />
               ))}
             </div>
           </div>
-          <label style={labelStyle}>
+          <label style={{ fontWeight: 'bold', fontSize: 16 }}>
             Tolerância Permitida:
             <input
               type="number"
@@ -283,19 +275,86 @@ export default function RegistrarCalibracao({ username, userType, empresa, userI
               value={dados.tolerancia}
               onChange={handleChange}
               required
-              style={inputStyle}
+              style={{
+                width: '100%',
+                padding: 10,
+                borderRadius: 8,
+                border: '1px solid #8bbbe8',
+                marginTop: 4,
+                fontSize: 16
+              }}
             />
           </label>
-          <button type="submit" style={submitBtn}>Registrar</button>
+          <label style={{ fontWeight: 'bold', fontSize: 16 }}>
+            Equipamento a calibrar:
+            <select
+              value={equipamentoId}
+              onChange={e => setEquipamentoId(e.target.value)}
+              disabled={!hasEquipamentos}
+              required
+              style={{
+                width: '100%',
+                padding: 10,
+                borderRadius: 8,
+                border: '1px solid #8bbbe8',
+                marginTop: 4,
+                fontSize: 16,
+                background: hasEquipamentos ? '#fff' : '#f0f0f0',
+                color: hasEquipamentos ? '#222' : '#888',
+                outline: 'none'
+              }}
+            >
+              <option value="">Selecione um equipamento</option>
+              {equipamentos.map(eq => (
+                <option key={eq.id} value={eq.id}>
+                  {eq.nome}
+                </option>
+              ))}
+            </select>
+          </label>
+          {!hasEquipamentos && (
+            <div style={{ color: 'red', marginTop: 8, fontWeight: 'bold' }}>
+              Você ainda não cadastrou nenhum equipamento.
+            </div>
+          )}
+          <button
+            type="submit"
+            disabled={!hasEquipamentos}
+            style={{
+              marginTop: 8,
+              padding: '12px 0',
+              background: hasEquipamentos ? '#0074d9' : '#b0b0b0',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              fontFamily: 'Oswald',
+              fontSize: 18,
+              fontWeight: 'bold',
+              cursor: hasEquipamentos ? 'pointer' : 'not-allowed',
+              transition: 'background 0.2s'
+            }}
+          >
+            Registrar Calibração
+          </button>
         </form>
-        {status && (
-          <div style={{ marginTop: 32 }}>
-            <h3 style={{ fontFamily: 'Oswald', fontSize: 24 }}>
-              Status da Calibração: {status}
-            </h3>
-            {alerta && <p style={{ color: 'red', fontFamily: 'Oswald', fontSize: 18 }}>{alerta}</p>}
-          </div>
-        )}
+        <button
+          onClick={onBack}
+          style={{
+            marginTop: 24,
+            width: '100%',
+            padding: '10px 0',
+            background: '#e0e7ef',
+            color: '#222',
+            border: '1px solid #8bbbe8',
+            borderRadius: 8,
+            fontFamily: 'Oswald',
+            fontWeight: 'bold',
+            fontSize: 16,
+            cursor: 'pointer'
+          }}
+        >
+          Voltar
+        </button>
       </div>
     </div>
   );

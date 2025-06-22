@@ -95,7 +95,12 @@ function App() {
     return (
       <RegistrarCalibracao
         username={username}
+        userType={userType}
+        empresa={empresa}
+        userId={userId}
+        equipamentos={equipments} // <- lista de equipamentos do usuário logado
         onBack={() => setTab('list')}
+        onRegister={() => {}} // Adicione a função onRegister aqui
       />
     );
   }
