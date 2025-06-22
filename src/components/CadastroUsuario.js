@@ -1,35 +1,48 @@
 import React, { useState } from 'react';
 
 export default function CadastroUsuario({ onCadastroSucesso, onBack }) {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [empresa, setEmpresa] = useState('');
+  const [form, setForm] = useState({
+    nome: '',
+    login: '',
+    senha: '',
+    empresa: ''
+  });
+  const [token, setToken] = useState('');
   const [mensagem, setMensagem] = useState('');
+
+  function handleChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    // Supondo que você tem o usuário logado em userId
-    await window.api.cadastrarUsuario({
-      nome,
-      login: nome, // aqui salva o nome como login
-      senha,
-      tipo: 'usuario',
-      empresa,
-      email // se quiser manter o e-mail separado (adicione o campo na tabela se for usar)
-    });
-    setMensagem('Usuário cadastrado com sucesso!');
-    setNome('');
-    setEmail('');
-    setSenha('');
-    setEmpresa('');
+    // Define tipo como 'usuario' fixo
+    const resposta = await window.api.cadastrarUsuario({ ...form, tipo: 'usuario' });
+    if (resposta.success) {
+      setToken(resposta.token);
+      setMensagem('Usuário cadastrado com sucesso!');
+      setForm({
+        nome: '',
+        login: '',
+        senha: '',
+        empresa: ''
+      });
+    } else {
+      alert(resposta.error || "Erro ao cadastrar usuário!");
+    }
+  }
+
+  function handleVoltar() {
+    setToken('');
+    setMensagem('');
     if (onCadastroSucesso) onCadastroSucesso();
+    if (onBack) onBack();
   }
 
   return (
     <div style={{ maxWidth: 400, margin: '40px auto', background: '#f7fbff', padding: 32, borderRadius: 8 }}>
       {onBack && (
-        <button type="button" onClick={onBack} style={{
+        <button type="button" onClick={handleVoltar} style={{
           marginBottom: 16,
           background: '#b3d7f7',
           border: '1px solid #222',
@@ -48,9 +61,10 @@ export default function CadastroUsuario({ onCadastroSucesso, onBack }) {
         <label style={{ fontWeight: 'bold' }}>
           Nome do Técnico:
           <input
+            name="nome"
             type="text"
-            value={nome}
-            onChange={e => setNome(e.target.value)}
+            value={form.nome}
+            onChange={handleChange}
             required
             style={{ width: '100%', padding: 8, borderRadius: 4, marginTop: 4 }}
           />
@@ -58,9 +72,10 @@ export default function CadastroUsuario({ onCadastroSucesso, onBack }) {
         <label style={{ fontWeight: 'bold' }}>
           E-mail:
           <input
+            name="login"
             type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            value={form.login}
+            onChange={handleChange}
             required
             style={{ width: '100%', padding: 8, borderRadius: 4, marginTop: 4 }}
           />
@@ -68,9 +83,10 @@ export default function CadastroUsuario({ onCadastroSucesso, onBack }) {
         <label style={{ fontWeight: 'bold' }}>
           Senha:
           <input
+            name="senha"
             type="password"
-            value={senha}
-            onChange={e => setSenha(e.target.value)}
+            value={form.senha}
+            onChange={handleChange}
             required
             style={{ width: '100%', padding: 8, borderRadius: 4, marginTop: 4 }}
           />
@@ -78,9 +94,10 @@ export default function CadastroUsuario({ onCadastroSucesso, onBack }) {
         <label style={{ fontWeight: 'bold' }}>
           Empresa:
           <input
+            name="empresa"
             type="text"
-            value={empresa}
-            onChange={e => setEmpresa(e.target.value)}
+            value={form.empresa}
+            onChange={handleChange}
             required
             style={{ width: '100%', padding: 8, borderRadius: 4, marginTop: 4 }}
           />
@@ -100,6 +117,13 @@ export default function CadastroUsuario({ onCadastroSucesso, onBack }) {
         </button>
         {mensagem && <div style={{ marginTop: 12, color: mensagem.includes('sucesso') ? 'green' : 'red' }}>{mensagem}</div>}
       </form>
+      {token && (
+        <div style={{ marginTop: 16, padding: 12, background: '#e0f7fa', border: '1px solid #0074d9' }}>
+          <strong>Token de acesso do usuário:</strong>
+          <div style={{ fontSize: 20, marginTop: 8 }}>{token}</div>
+          <div style={{ marginTop: 8, color: '#0074d9' }}>Anote este token e entregue ao usuário!</div>
+        </div>
+      )}
     </div>
   );
 }

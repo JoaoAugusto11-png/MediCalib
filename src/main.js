@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { cadastrarUsuario, autenticarUsuario, cadastrarEquipamento, listarEquipamentosPorUsuario, excluirEquipamento, editarEquipamento } = require('./database'); // ajuste o caminho se necessário
+const { cadastrarUsuario, autenticarUsuario, cadastrarEquipamento, listarEquipamentosPorUsuario, excluirEquipamento, editarEquipamento, validarToken, redefinirSenha } = require('./database'); // ajuste o caminho se necessário
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -31,8 +31,8 @@ ipcMain.handle('cadastrar-usuario', async (event, dadosUsuario) => {
 });
 
 // IPC para login de usuário
-ipcMain.handle('login-usuario', async (event, dadosLogin) => {
-  return autenticarUsuario(dadosLogin);
+ipcMain.handle('autenticar-usuario', async (event, dados) => {
+  return autenticarUsuario(dados);
 });
 
 // IPC para cadastro de equipamento
@@ -53,6 +53,16 @@ ipcMain.handle('excluir-equipamento', async (event, id) => {
 // IPC para editar equipamento
 ipcMain.handle('editar-equipamento', async (event, dados) => {
   return editarEquipamento(dados);
+});
+
+// IPC para validar token de recuperação de senha
+ipcMain.handle('validar-token', async (event, dados) => {
+  return validarToken(dados);
+});
+
+// IPC para redefinir senha
+ipcMain.handle('redefinir-senha', async (event, dados) => {
+  return redefinirSenha(dados);
 });
 
 ipcMain.on('sair-app', () => {

@@ -8,4 +8,7 @@ contextBridge.exposeInMainWorld('api', {
   listarEquipamentosUsuario: (usuario_id) => ipcRenderer.invoke('listar-equipamentos-usuario', usuario_id),
   excluirEquipamento: (id) => ipcRenderer.invoke('excluir-equipamento', id),
   editarEquipamento: (dados) => ipcRenderer.invoke('editar-equipamento', dados),
+  validarToken: (dados) => ipcRenderer.invoke('validar-token', dados),
+  redefinirSenha: (dados) => ipcRenderer.invoke('redefinir-senha', dados),
+  autenticarUsuario: (dados) => ipcRenderer.invoke('autenticar-usuario', dados),
 });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import Login from './components/Login';
+import RecuperarSenha from './components/RecuperarSenha';
 import EquipmentList from './components/EquipmentList';
 import RegisterEquipment from './components/RegisterEquipment';
 import RegistrarCalibracao from './components/RegistrarCalibracao';
@@ -9,6 +10,8 @@ import CadastroUsuario from './components/CadastroUsuario';
 
 function App() {
   const [logged, setLogged] = useState(false);
+  const [showRecuperarSenha, setShowRecuperarSenha] = useState(false);
+  const [loginKey, setLoginKey] = useState(0);
   const [username, setUsername] = useState('');
   const [userType, setUserType] = useState(''); // 'admin' ou 'usuario'
   const [empresa, setEmpresa] = useState('');   // <-- Adicionado
@@ -17,16 +20,21 @@ function App() {
   const [equipments, setEquipments] = useState([]);
   const [editingEquipamento, setEditingEquipamento] = useState(null);
 
-  async function handleLogin(usuario) {
-    setUsername(usuario.nome);
-    setUserType(usuario.tipo);
-    setEmpresa(usuario.empresa || ''); // <-- Salva a empresa do usuário
-    setUserId(usuario.id);
-    setLogged(true);
-
-    // Busque os equipamentos do usuário logado
-    const equipamentos = await window.api.listarEquipamentosUsuario(usuario.id);
-    setEquipments(equipamentos);
+  async function handleLogin(login, senha) {
+    console.log('Tentando login automático:', login, senha);
+    const resposta = await window.api.autenticarUsuario({ login, senha });
+    if (resposta.success) {
+      const usuario = resposta.usuario;
+      setUsername(usuario.nome);
+      setUserType(usuario.tipo);
+      setEmpresa(usuario.empresa || '');
+      setUserId(usuario.id);
+      setLogged(true);
+      const equipamentos = await window.api.listarEquipamentosUsuario(usuario.id);
+      setEquipments(equipamentos);
+    } else {
+      alert('Login ou senha inválidos!');
+    }
   }
 
   async function handleRegister() {
@@ -50,7 +58,28 @@ function App() {
     await atualizarEquipamentos();
   }
 
-  if (!logged) return <Login onLogin={handleLogin} />;
+  function handleVoltarRecuperarSenha() {
+    setShowRecuperarSenha(false);
+    setLoginKey(prev => prev + 1); // Força remontagem
+  }
+
+  if (!logged) {
+    if (showRecuperarSenha) {
+      return (
+        <RecuperarSenha
+          onLoginDireto={handleLogin}
+          onVoltar={handleVoltarRecuperarSenha}
+        />
+      );
+    }
+    return (
+      <Login
+        key={loginKey}
+        onLogin={handleLogin}
+        onEsqueceuSenha={() => setShowRecuperarSenha(true)}
+      />
+    );
+  }
 
   if (tab === 'register') {
     return (
@@ -105,9 +134,3 @@ function App() {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
-{onBack && (
-  <button type="button" onClick={onBack} style={{ marginBottom: 16 }}>
-    ⟵ Voltar
-  </button>
-)}

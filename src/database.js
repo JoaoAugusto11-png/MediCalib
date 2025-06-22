@@ -96,21 +96,19 @@ function inserirManutencao(manutencao) {
   return info.lastInsertRowid;
 }
 
+function gerarToken() {
+  return Math.random().toString(36).substr(2, 8).toUpperCase();
+}
+
 // Função para cadastrar usuário (apenas admin deve poder usar)
 function cadastrarUsuario({ nome, login, senha, tipo, empresa }) {
+  const token = gerarToken(); // Função que gera o token
   const stmt = db.prepare(`
-    INSERT INTO usuarios (nome, login, senha, tipo, empresa)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO usuarios (nome, login, senha, tipo, empresa, token)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
-  try {
-    stmt.run(nome, login, senha, tipo, empresa);
-    return { success: true };
-  } catch (err) {
-    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-      return { success: false, error: 'Login já existe.' };
-    }
-    return { success: false, error: err.message };
-  }
+  stmt.run(nome, login, senha, tipo, empresa, token);
+  return { success: true, token }; // <-- IMPORTANTE: retorna o token
 }
 
 // Função para autenticar login
@@ -158,6 +156,28 @@ function editarEquipamento({ id, nome, fabricante, modelo, numero_serie }) {
   return { success: true };
 }
 
+// Validar token de recuperação de senha
+function validarToken({ login, token }) {
+  const stmt = db.prepare(`
+    SELECT id FROM usuarios
+    WHERE LOWER(TRIM(login)) = LOWER(TRIM(?)) AND LOWER(TRIM(token)) = LOWER(TRIM(?))
+  `);
+  const usuario = stmt.get(login.trim(), token.trim());
+  console.log('Tentando validar token:', login, token, 'Encontrado:', usuario);
+  return !!usuario;
+}
+
+// Redefinir senha usando token
+function redefinirSenha({ login, token, novaSenha }) {
+  const stmt = db.prepare(`
+    UPDATE usuarios
+    SET senha = ?
+    WHERE LOWER(TRIM(login)) = LOWER(TRIM(?)) AND LOWER(TRIM(token)) = LOWER(TRIM(?))
+  `);
+  stmt.run(novaSenha, login.trim(), token.trim());
+  return { success: true };
+}
+
 module.exports = {
   db,
   inserirManutencao,
@@ -167,4 +187,6 @@ module.exports = {
   listarEquipamentosPorUsuario,
   excluirEquipamento,
   editarEquipamento,
+  validarToken,
+  redefinirSenha
 };

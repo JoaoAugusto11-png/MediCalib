@@ -1,23 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Login.css';
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, onEsqueceuSenha }) {
   const [login, setLogin] = useState('');
   const [senha, setSenha] = useState('');
+  const loginInputRef = useRef(null);
 
-  async function handleSubmit(e) {
+  useEffect(() => {
+    setLogin('');
+    setSenha('');
+    // Garante o foco após a montagem do componente
+    requestAnimationFrame(() => {
+      if (loginInputRef.current) {
+        loginInputRef.current.value = '';
+        loginInputRef.current.focus();
+      }
+    });
+  }, []);
+
+  function handleSubmit(e) {
     e.preventDefault();
-    // Chama o backend para autenticar
-    const resposta = await window.api.loginUsuario({ login, senha });
-    if (resposta.success) {
-      onLogin(resposta.usuario); // Passe o objeto inteiro
-    } else {
-      alert(resposta.error || "Login ou senha inválidos!");
-    }
+    onLogin(login, senha);
   }
 
   return (
-    <div className="login-bg">
+    <div className="login-bg" onClick={() => {
+      if (loginInputRef.current) loginInputRef.current.focus();
+    }}>
       <div className="login-card">
         <h1 className="login-title">MEDICALIB</h1>
         <form onSubmit={handleSubmit}>
@@ -28,6 +37,8 @@ export default function Login({ onLogin }) {
             type="text"
             value={login}
             onChange={e => setLogin(e.target.value)}
+            ref={loginInputRef}
+            autoComplete="username"
           />
 
           <label className="login-label" htmlFor="senha">SENHA</label>
@@ -37,12 +48,18 @@ export default function Login({ onLogin }) {
             type="password"
             value={senha}
             onChange={e => setSenha(e.target.value)}
+            autoComplete="current-password"
           />
 
-          <div className="login-forgot">ESQUECEU A SENHA?</div>
+          <div
+            className="login-forgot"
+            style={{ cursor: 'pointer', color: '#0074d9', marginTop: 8 }}
+            onClick={onEsqueceuSenha}
+          >
+            ESQUECEU A SENHA?
+          </div>
           <button type="submit" style={{ display: 'none' }}></button>
         </form>
-        {/* Removido o rodapé de cadastro */}
       </div>
     </div>
   );
