@@ -11,7 +11,6 @@ import CadastroUsuario from './components/CadastroUsuario';
 function App() {
   const [logged, setLogged] = useState(false);
   const [showRecuperarSenha, setShowRecuperarSenha] = useState(false);
-  const [loginKey, setLoginKey] = useState(0);
   const [username, setUsername] = useState('');
   const [userType, setUserType] = useState(''); // 'admin' ou 'usuario'
   const [empresa, setEmpresa] = useState('');   // <-- Adicionado
@@ -21,7 +20,6 @@ function App() {
   const [editingEquipamento, setEditingEquipamento] = useState(null);
 
   async function handleLogin(login, senha) {
-    console.log('Tentando login automático:', login, senha);
     const resposta = await window.api.autenticarUsuario({ login, senha });
     if (resposta.success) {
       const usuario = resposta.usuario;
@@ -32,8 +30,10 @@ function App() {
       setLogged(true);
       const equipamentos = await window.api.listarEquipamentosUsuario(usuario.id);
       setEquipments(equipamentos);
+      return true;
     } else {
       alert('Login ou senha inválidos!');
+      return false;
     }
   }
 
@@ -60,7 +60,7 @@ function App() {
 
   function handleVoltarRecuperarSenha() {
     setShowRecuperarSenha(false);
-    setLoginKey(prev => prev + 1); // Força remontagem
+    // Não precisa mais do setLoginKey
   }
 
   function handleLogout() {
@@ -84,7 +84,6 @@ function App() {
     }
     return (
       <Login
-        key={loginKey}
         onLogin={handleLogin}
         onEsqueceuSenha={() => setShowRecuperarSenha(true)}
       />
@@ -108,9 +107,9 @@ function App() {
         userType={userType}
         empresa={empresa}
         userId={userId}
-        equipamentos={equipments} // <- lista de equipamentos do usuário logado
+        equipamentos={equipments}
         onBack={() => setTab('list')}
-        onRegister={() => {}} // Adicione a função onRegister aqui
+        onRegister={() => {}}
       />
     );
   }
@@ -122,9 +121,9 @@ function App() {
         userType={userType}
         empresa={empresa}
         userId={userId}
-        equipamentos={equipments} // <- isso deve ser um array com os equipamentos do usuário logado
+        equipamentos={equipments}
         onBack={() => setTab('list')}
-        onRegister={() => {}} // Adicione a função onRegister aqui
+        onRegister={() => {}}
       />
     );
   }
@@ -144,7 +143,7 @@ function App() {
     <EquipmentList
       username={username}
       userType={userType}
-      empresa={empresa} // <-- Passe a empresa para o menu lateral
+      empresa={empresa}
       equipments={equipamentosList}
       onRegisterClick={() => setTab('register')}
       onCalibracaoClick={() => setTab('calibracao')}
@@ -158,7 +157,3 @@ function App() {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
-{equipamentosList.map(eq => (
-  <option key={eq.id} value={eq.id}>{eq.nome}</option>
-))}

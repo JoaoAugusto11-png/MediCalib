@@ -73,3 +73,36 @@
   cursor: pointer;
   margin-left: 4px;
 }
+
+.login-btn {
+  width: 350px;
+  max-width: 80vw;
+  height: 44px;
+  font-size: 20px;
+  font-family: 'Oswald', Arial, sans-serif;
+  font-weight: bold;
+  background: #0074d9;
+  color: #fff;
+  border: none;
+  border-radius: 2px;
+  margin-top: 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.login-btn:disabled {
+  background: #b0c4d9;
+  cursor: not-allowed;
+  color: #eee;
+}
+
+.login-btn:hover:not(:disabled) {
+  background: #005fa3;
+}
+
+.login-btn:active {
+  background: #00497a;
+}

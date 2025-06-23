@@ -1,32 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './Login.css';
 
 export default function Login({ onLogin, onEsqueceuSenha }) {
   const [login, setLogin] = useState('');
   const [senha, setSenha] = useState('');
+  const [loading, setLoading] = useState(false);
   const loginInputRef = useRef(null);
 
   useEffect(() => {
-    setLogin('');
-    setSenha('');
-    // Garante o foco após a montagem do componente
-    requestAnimationFrame(() => {
-      if (loginInputRef.current) {
-        loginInputRef.current.value = '';
-        loginInputRef.current.focus();
-      }
-    });
+    if (loginInputRef.current) {
+      loginInputRef.current.focus();
+    }
   }, []);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    onLogin(login, senha);
+    setLoading(true);
+    try {
+      const result = await onLogin(login, senha);
+      if (!result) {
+        setLogin('');
+        setSenha('');
+        setTimeout(() => {
+          if (loginInputRef.current) loginInputRef.current.focus();
+        }, 0);
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <div className="login-bg" onClick={() => {
-      if (loginInputRef.current) loginInputRef.current.focus();
-    }}>
+    <div className="login-bg">
       <div className="login-card">
         <h1 className="login-title">MEDICALIB</h1>
         <form onSubmit={handleSubmit}>
@@ -39,6 +44,9 @@ export default function Login({ onLogin, onEsqueceuSenha }) {
             onChange={e => setLogin(e.target.value)}
             ref={loginInputRef}
             autoComplete="username"
+            disabled={loading}
+            placeholder="Usuário"
+            autoFocus
           />
 
           <label className="login-label" htmlFor="senha">SENHA</label>
@@ -49,6 +57,7 @@ export default function Login({ onLogin, onEsqueceuSenha }) {
             value={senha}
             onChange={e => setSenha(e.target.value)}
             autoComplete="current-password"
+            placeholder="Senha"
           />
 
           <div
@@ -58,7 +67,13 @@ export default function Login({ onLogin, onEsqueceuSenha }) {
           >
             ESQUECEU A SENHA?
           </div>
-          <button type="submit" style={{ display: 'none' }}></button>
+          <button
+            type="submit"
+            className="login-btn"
+            disabled={loading}
+          >
+            Entrar
+          </button>
         </form>
       </div>
     </div>
