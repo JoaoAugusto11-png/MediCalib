@@ -178,6 +178,46 @@ function redefinirSenha({ login, token, novaSenha }) {
   return { success: true };
 }
 
+function agendarManutencao({
+  equipamento_id,
+  tipo,
+  prioridade,
+  data_hora_prevista,
+  causa,
+  tecnico_id,
+  supervisor,
+  duracao,
+  janela_inicio,
+  janela_fim,
+  requer_aprovacao,
+  justificativa,
+  status,
+  usuario_id
+}) {
+  const stmt = db.prepare(`
+    INSERT INTO manutencoes (
+      equipamento_id, tipo, prioridade, data_hora_prevista, causa, tecnico_id, supervisor, duracao, janela_inicio, janela_fim, requer_aprovacao, justificativa, status, usuario_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  stmt.run(
+    equipamento_id,
+    tipo,
+    prioridade,
+    data_hora_prevista,
+    causa,
+    tecnico_id,
+    supervisor,
+    duracao,
+    janela_inicio,
+    janela_fim,
+    requer_aprovacao ? 1 : 0,
+    justificativa,
+    status,
+    usuario_id
+  );
+  return { success: true };
+}
+
 module.exports = {
   db,
   inserirManutencao,
@@ -188,5 +228,6 @@ module.exports = {
   excluirEquipamento,
   editarEquipamento,
   validarToken,
-  redefinirSenha
+  redefinirSenha,
+  agendarManutencao,
 };

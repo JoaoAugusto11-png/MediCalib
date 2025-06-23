@@ -31,9 +31,11 @@ const submitBtn = {
   marginTop: 16
 };
 
-export default function AgendarManutencao({ onBack, username, userType, empresa, userId, onRegister }) {
+export default function AgendarManutencao({ onBack, username, userType, empresa, userId, onRegister, equipamentos }) {
+  // Garante que equipamentos sempre é um array
+  const equipamentosList = Array.isArray(equipamentos) ? equipamentos : [];
+
   const [form, setForm] = useState({
-    equipamento: "",
     tipo: "",
     prioridade: "",
     dataHora: "",
@@ -48,7 +50,8 @@ export default function AgendarManutencao({ onBack, username, userType, empresa,
     status: "Agendada"
   });
 
-  const [tab, setTab] = useState('agendar'); // Estado para controlar a aba atual
+  const [tab, setTab] = useState('agendar');
+  const [equipamentoId, setEquipamentoId] = useState('');
 
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
@@ -60,37 +63,76 @@ export default function AgendarManutencao({ onBack, username, userType, empresa,
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!window.api || !window.api.inserirManutencao) {
+    if (!window.api || !window.api.agendarManutencao) {
       alert("API do backend não disponível!");
       return;
     }
-    const resposta = await window.api.inserirManutencao(form);
-    if (resposta.success) {
-      alert("Manutenção agendada com sucesso!");
-      setForm({
-        equipamento: "",
-        tipo: "",
-        prioridade: "",
-        dataHora: "",
-        causa: "",
-        tecnico: "",
-        supervisor: "",
-        duracao: "",
-        janelaInicio: "",
-        janelaFim: "",
-        requerAprovacao: false,
-        justificativa: "",
-        status: "Agendada"
+    try {
+      const {
+        tipo,
+        prioridade,
+        dataHora: data_hora_prevista,
+        causa,
+        tecnico, // nome do técnico
+        supervisor,
+        duracao,
+        janelaInicio: janela_inicio,
+        janelaFim: janela_fim,
+        requerAprovacao: requer_aprovacao,
+        justificativa,
+        status
+      } = form;
+
+      if (!equipamentoId) {
+        alert("Selecione um equipamento!");
+        return;
+      }
+
+      const resposta = await window.api.agendarManutencao({
+        equipamento_id: equipamentoId,
+        tipo,
+        prioridade,
+        data_hora_prevista,
+        causa,
+        tecnico_id: userId, // <-- ID do usuário logado
+        supervisor,
+        duracao,
+        janela_inicio,
+        janela_fim,
+        requer_aprovacao,
+        justificativa,
+        status,
+        usuario_id: userId // se precisar registrar o usuário que agendou
       });
-    } else {
-      alert("Erro ao agendar: " + resposta.error);
+      if (resposta && resposta.success) {
+        alert("Manutenção agendada com sucesso!");
+        setForm({
+          tipo: "",
+          prioridade: "",
+          dataHora: "",
+          causa: "",
+          tecnico: "",
+          supervisor: "",
+          duracao: "",
+          janelaInicio: "",
+          janelaFim: "",
+          requerAprovacao: false,
+          justificativa: "",
+          status: "Agendada"
+        });
+        setEquipamentoId('');
+      } else {
+        alert('Erro ao agendar manutenção!');
+      }
+    } catch (err) {
+      alert('Erro inesperado: ' + err.message);
+      console.error(err);
     }
   };
 
   const handleRegister = () => {
-    // Lógica para lidar com o registro do equipamento
-    alert("Equipamento registrado com sucesso!"); // Exemplo de ação após registro
-    setTab('agendar'); // Volta para a aba de agendar manutenção
+    alert("Equipamento registrado com sucesso!");
+    setTab('agendar');
   };
 
   if (tab === 'register') {
@@ -143,7 +185,17 @@ export default function AgendarManutencao({ onBack, username, userType, empresa,
         <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: '40px auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
           <label style={labelStyle}>
             Equipamento:
-            <input name="equipamento" value={form.equipamento} onChange={handleChange} required style={inputStyle} />
+            <select
+              value={equipamentoId}
+              onChange={e => setEquipamentoId(e.target.value)}
+              required
+              style={inputStyle}
+            >
+              <option value="">Selecione um equipamento</option>
+              {equipamentosList.map(eq => (
+                <option key={eq.id} value={eq.id}>{eq.nome}</option>
+              ))}
+            </select>
           </label>
           <label style={labelStyle}>
             Tipo:
@@ -175,7 +227,11 @@ export default function AgendarManutencao({ onBack, username, userType, empresa,
           )}
           <label style={labelStyle}>
             Técnico Responsável:
-            <input name="tecnico" value={form.tecnico} onChange={handleChange} required style={inputStyle} />
+            <input
+              value={username}
+              disabled
+              style={inputStyle}
+            />
           </label>
           <label style={labelStyle}>
             Supervisor:

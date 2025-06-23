@@ -12,6 +12,7 @@ export default function RegistrarCalibracao({
     valoresReferencia: ['', '', ''],
     valoresCalibrado: ['', '', ''],
     tolerancia: '',
+    observacoes: '',
   });
 
   const [status, setStatus] = useState('');
@@ -43,61 +44,18 @@ export default function RegistrarCalibracao({
     return 'Dentro';
   }
 
-  function gerarLaudoPDF(dados, status) {
-    const doc = new jsPDF();
-
-    // Cabeçalho com fundo azul
-    doc.setFillColor(148, 200, 247); // azul claro
-    doc.rect(0, 0, 210, 25, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(33, 33, 33);
-    doc.text("Laudo de Calibração", 105, 17, { align: "center" });
-
-    // Dados principais
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Data: ${dados.data}`, 10, 35);
-    doc.text(`Técnico: ${dados.tecnico}`, 10, 43);
-    doc.text(`Temperatura: ${dados.temperatura} °C`, 10, 51);
-    doc.text(`Umidade: ${dados.umidade} %`, 10, 59);
-    doc.text(`Tolerância: ${dados.tolerancia}`, 10, 67);
-
-    // Tabela de valores
-    doc.setFont("helvetica", "bold");
-    doc.text("Valores", 10, 80);
-    doc.setFont("helvetica", "normal");
-    doc.text("Referência", 40, 80);
-    doc.text("Calibrado", 90, 80);
-
-    for (let i = 0; i < 3; i++) {
-      doc.text(`Valor ${i + 1}:`, 10, 90 + i * 10);
-      doc.text(String(dados.valoresReferencia[i]), 45, 90 + i * 10);
-      doc.text(String(dados.valoresCalibrado[i]), 95, 90 + i * 10);
-    }
-
-    // Status com cor
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    if (status === "Dentro") {
-      doc.setTextColor(0, 128, 0);
+  async function gerarLaudoPDF(dadosParaPdf) {
+    const resposta = await window.api.gerarPdfCalibracao(dadosParaPdf);
+    if (resposta && resposta.success) {
+      alert('PDF salvo em: ' + resposta.caminho);
+    } else if (resposta && resposta.canceled) {
+      alert('Operação cancelada pelo usuário.');
     } else {
-      doc.setTextColor(200, 0, 0);
+      alert('Erro ao gerar PDF.');
     }
-    doc.text(`Status da Calibração: ${status}`, 10, 130);
-
-    // Linha de assinatura
-    doc.setDrawColor(0, 0, 0);
-    doc.line(10, 160, 80, 160);
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Assinatura do Técnico", 10, 165);
-
-    doc.save("laudo_calibracao.pdf");
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!hasEquipamentos) return;
     const valoresRef = dados.valoresReferencia.map(Number);
@@ -106,7 +64,27 @@ export default function RegistrarCalibracao({
     const statusCalc = calcularStatus(valoresRef, valoresCal, tolerancia);
     setStatus(statusCalc);
     setAlerta(statusCalc === 'Fora' ? 'Atenção: Fora da tolerância!' : '');
-    gerarLaudoPDF(dados, statusCalc); // <-- Gera o PDF após o submit
+
+    // Busca o nome do equipamento selecionado
+    const equipamentoSelecionado = equipamentos.find(eq => eq.id === Number(equipamentoId));
+
+    // Monta objeto para o PDF
+    const dadosParaPdf = {
+      ...dados,
+      equipamento_nome: equipamentoSelecionado ? equipamentoSelecionado.nome : '',
+      numero_serie: equipamentoSelecionado ? equipamentoSelecionado.numero_serie || '' : '',
+      empresa,
+      tecnico_nome: username,
+      parametro: valoresRef.join(', '),
+      valor_calibrado: valoresCal.join(', '),
+      tolerancia: dados.tolerancia,
+      resultado: statusCalc,
+      dentro_padrao: statusCalc === 'Dentro',
+      observacoes: dados.observacoes || '',
+      data: dados.data,
+    };
+
+    await gerarLaudoPDF(dadosParaPdf);
     onRegister({ equipamentoId, ...dados });
   }
 
@@ -197,15 +175,15 @@ export default function RegistrarCalibracao({
               type="text"
               name="tecnico"
               value={dados.tecnico}
-              onChange={handleChange}
-              required
+              disabled
               style={{
                 width: '100%',
                 padding: 10,
                 borderRadius: 8,
                 border: '1px solid #8bbbe8',
                 marginTop: 4,
-                fontSize: 16
+                fontSize: 16,
+                background: '#f0f0f0'
               }}
             />
           </label>
@@ -275,6 +253,23 @@ export default function RegistrarCalibracao({
               value={dados.tolerancia}
               onChange={handleChange}
               required
+              style={{
+                width: '100%',
+                padding: 10,
+                borderRadius: 8,
+                border: '1px solid #8bbbe8',
+                marginTop: 4,
+                fontSize: 16
+              }}
+            />
+          </label>
+          <label style={{ fontWeight: 'bold', fontSize: 16 }}>
+            Observações:
+            <input
+              type="text"
+              name="observacoes"
+              value={dados.observacoes}
+              onChange={handleChange}
               style={{
                 width: '100%',
                 padding: 10,

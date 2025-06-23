@@ -118,7 +118,13 @@ function App() {
   if (tab === 'manutencao') {
     return (
       <AgendarManutencao
+        username={username}
+        userType={userType}
+        empresa={empresa}
+        userId={userId}
+        equipamentos={equipments} // <- isso deve ser um array com os equipamentos do usuário logado
         onBack={() => setTab('list')}
+        onRegister={() => {}} // Adicione a função onRegister aqui
       />
     );
   }
@@ -132,12 +138,14 @@ function App() {
     );
   }
 
+  const equipamentosList = Array.isArray(equipments) ? equipments : [];
+
   return (
     <EquipmentList
       username={username}
       userType={userType}
       empresa={empresa} // <-- Passe a empresa para o menu lateral
-      equipments={equipments}
+      equipments={equipamentosList}
       onRegisterClick={() => setTab('register')}
       onCalibracaoClick={() => setTab('calibracao')}
       onAgendarManutencaoClick={() => setTab('manutencao')}
@@ -150,3 +158,7 @@ function App() {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
+
+{equipamentosList.map(eq => (
+  <option key={eq.id} value={eq.id}>{eq.nome}</option>
+))}

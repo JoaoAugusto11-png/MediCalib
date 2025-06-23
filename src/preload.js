@@ -11,4 +11,6 @@ contextBridge.exposeInMainWorld('api', {
   validarToken: (dados) => ipcRenderer.invoke('validar-token', dados),
   redefinirSenha: (dados) => ipcRenderer.invoke('redefinir-senha', dados),
   autenticarUsuario: (dados) => ipcRenderer.invoke('autenticar-usuario', dados),
+  agendarManutencao: (dados) => ipcRenderer.invoke('agendar-manutencao', dados),
+  gerarPdfCalibracao: (dados) => ipcRenderer.invoke('gerar-pdf-calibracao', dados),
 });

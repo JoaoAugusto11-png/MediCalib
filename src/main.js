@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { cadastrarUsuario, autenticarUsuario, cadastrarEquipamento, listarEquipamentosPorUsuario, excluirEquipamento, editarEquipamento, validarToken, redefinirSenha } = require('./database'); // ajuste o caminho se necessário
+const { cadastrarUsuario, autenticarUsuario, cadastrarEquipamento, listarEquipamentosPorUsuario, excluirEquipamento, editarEquipamento, validarToken, redefinirSenha, agendarManutencao } = require('./database'); // ajuste o caminho se necessário
+const { gerarPdfCalibracao } = require('./pdf');
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -63,6 +64,17 @@ ipcMain.handle('validar-token', async (event, dados) => {
 // IPC para redefinir senha
 ipcMain.handle('redefinir-senha', async (event, dados) => {
   return redefinirSenha(dados);
+});
+
+// IPC para agendar manutenção
+ipcMain.handle('agendar-manutencao', async (event, dados) => {
+  console.log('Chamando agendarManutencao com:', dados);
+  return agendarManutencao(dados);
+});
+
+// IPC para gerar PDF de calibração
+ipcMain.handle('gerar-pdf-calibracao', async (event, dados) => {
+  return await gerarPdfCalibracao(dados);
 });
 
 ipcMain.on('sair-app', () => {
