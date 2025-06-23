@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import RegisterEquipment from "./RegisterEquipment"; // Certifique-se de que o caminho está correto
 
 const inputStyle = {
@@ -134,6 +134,13 @@ export default function AgendarManutencao({ onBack, username, userType, empresa,
     alert("Equipamento registrado com sucesso!");
     setTab('agendar');
   };
+
+  useEffect(() => {
+    return () => {
+      // Limpeza de qualquer estado global ou efeito colateral
+      // Exemplo: window.removeEventListener(...);
+    };
+  }, []);
 
   if (tab === 'register') {
     return (

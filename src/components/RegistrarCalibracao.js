@@ -1,23 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function RegistrarCalibracao({
-  username, userType, empresa, userId, equipamentos = [], onBack, onRegister
-}) {
-  const [equipamentoId, setEquipamentoId] = useState('');
+export default function RegistrarCalibracao(props) {
   const [dados, setDados] = useState({
     data: '',
     temperatura: '',
     umidade: '',
-    tecnico: username || '',
+    tecnico: props.username || '',
     valoresReferencia: ['', '', ''],
     valoresCalibrado: ['', '', ''],
     tolerancia: '',
     observacoes: '',
   });
+  const [equipamentoId, setEquipamentoId] = useState('');
 
-  const [status, setStatus] = useState('');
-  const [alerta, setAlerta] = useState('');
-  const hasEquipamentos = equipamentos && equipamentos.length > 0;
+  // Resetar o formulário ao abrir a tela
+  useEffect(() => {
+    setDados({
+      data: '',
+      temperatura: '',
+      umidade: '',
+      tecnico: props.username || '',
+      valoresReferencia: ['', '', ''],
+      valoresCalibrado: ['', '', ''],
+      tolerancia: '',
+      observacoes: '',
+    });
+    setEquipamentoId('');
+  }, []); // [] garante que roda só ao montar
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -57,24 +66,24 @@ export default function RegistrarCalibracao({
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!hasEquipamentos) return;
+    if (!props.equipamentos) return;
     const valoresRef = dados.valoresReferencia.map(Number);
     const valoresCal = dados.valoresCalibrado.map(Number);
     const tolerancia = parseFloat(dados.tolerancia);
     const statusCalc = calcularStatus(valoresRef, valoresCal, tolerancia);
-    setStatus(statusCalc);
-    setAlerta(statusCalc === 'Fora' ? 'Atenção: Fora da tolerância!' : '');
+    props.setStatus(statusCalc);
+    props.setAlerta(statusCalc === 'Fora' ? 'Atenção: Fora da tolerância!' : '');
 
     // Busca o nome do equipamento selecionado
-    const equipamentoSelecionado = equipamentos.find(eq => eq.id === Number(equipamentoId));
+    const equipamentoSelecionado = props.equipamentos.find(eq => eq.id === Number(equipamentoId));
 
     // Monta objeto para o PDF
     const dadosParaPdf = {
       ...dados,
       equipamento_nome: equipamentoSelecionado ? equipamentoSelecionado.nome : '',
       numero_serie: equipamentoSelecionado ? equipamentoSelecionado.numero_serie || '' : '',
-      empresa,
-      tecnico_nome: username,
+      empresa: props.empresa,
+      tecnico_nome: props.username,
       parametro: valoresRef.join(', '),
       valor_calibrado: valoresCal.join(', '),
       tolerancia: dados.tolerancia,
@@ -85,7 +94,7 @@ export default function RegistrarCalibracao({
     };
 
     await gerarLaudoPDF(dadosParaPdf);
-    onRegister({ equipamentoId, ...dados });
+    props.onRegister({ equipamentoId, ...dados });
   }
 
   return (
@@ -198,9 +207,9 @@ export default function RegistrarCalibracao({
               {[0, 1, 2].map(i => (
                 <input
                   key={i}
-                  type="number"
+                  type="number" // ou "text" se quiser permitir qualquer formato
                   name={`valorReferencia${i}`}
-                  value={dados.valoresReferencia[i]}
+                  value={dados.valoresReferencia[i] || ''}
                   onChange={handleChange}
                   required
                   placeholder={`Valor ${i + 1}`}
@@ -227,9 +236,9 @@ export default function RegistrarCalibracao({
               {[0, 1, 2].map(i => (
                 <input
                   key={i}
-                  type="number"
+                  type="number" // ou "text" se quiser permitir qualquer formato
                   name={`valorCalibrado${i}`}
-                  value={dados.valoresCalibrado[i]}
+                  value={dados.valoresCalibrado[i] || ''}
                   onChange={handleChange}
                   required
                   placeholder={`Valor ${i + 1}`}
@@ -285,7 +294,7 @@ export default function RegistrarCalibracao({
             <select
               value={equipamentoId}
               onChange={e => setEquipamentoId(e.target.value)}
-              disabled={!hasEquipamentos}
+              disabled={!props.equipamentos}
               required
               style={{
                 width: '100%',
@@ -294,38 +303,38 @@ export default function RegistrarCalibracao({
                 border: '1px solid #8bbbe8',
                 marginTop: 4,
                 fontSize: 16,
-                background: hasEquipamentos ? '#fff' : '#f0f0f0',
-                color: hasEquipamentos ? '#222' : '#888',
+                background: props.equipamentos ? '#fff' : '#f0f0f0',
+                color: props.equipamentos ? '#222' : '#888',
                 outline: 'none'
               }}
             >
               <option value="">Selecione um equipamento</option>
-              {equipamentos.map(eq => (
+              {props.equipamentos && props.equipamentos.map(eq => (
                 <option key={eq.id} value={eq.id}>
                   {eq.nome}
                 </option>
               ))}
             </select>
           </label>
-          {!hasEquipamentos && (
+          {!props.equipamentos && (
             <div style={{ color: 'red', marginTop: 8, fontWeight: 'bold' }}>
               Você ainda não cadastrou nenhum equipamento.
             </div>
           )}
           <button
             type="submit"
-            disabled={!hasEquipamentos}
+            disabled={!props.equipamentos}
             style={{
               marginTop: 8,
               padding: '12px 0',
-              background: hasEquipamentos ? '#0074d9' : '#b0b0b0',
+              background: props.equipamentos ? '#0074d9' : '#b0b0b0',
               color: '#fff',
               border: 'none',
               borderRadius: 8,
               fontFamily: 'Oswald',
               fontSize: 18,
               fontWeight: 'bold',
-              cursor: hasEquipamentos ? 'pointer' : 'not-allowed',
+              cursor: props.equipamentos ? 'pointer' : 'not-allowed',
               transition: 'background 0.2s'
             }}
           >
@@ -333,7 +342,7 @@ export default function RegistrarCalibracao({
           </button>
         </form>
         <button
-          onClick={onBack}
+          onClick={props.onBack}
           style={{
             marginTop: 24,
             width: '100%',

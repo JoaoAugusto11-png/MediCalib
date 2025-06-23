@@ -103,6 +103,7 @@ function App() {
   if (tab === 'calibracao') {
     return (
       <RegistrarCalibracao
+        key={tab} // Isso força o React a desmontar e remontar o componente ao trocar de tela
         username={username}
         userType={userType}
         empresa={empresa}
