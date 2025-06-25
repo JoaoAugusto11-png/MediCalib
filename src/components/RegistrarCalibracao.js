@@ -13,7 +13,7 @@ export default function RegistrarCalibracao(props) {
   });
   const [equipamentoId, setEquipamentoId] = useState('');
 
-  // Resetar o formulário ao abrir a tela
+  
   useEffect(() => {
     setDados({
       data: '',
@@ -26,7 +26,7 @@ export default function RegistrarCalibracao(props) {
       observacoes: '',
     });
     setEquipamentoId('');
-  }, []); // [] garante que roda só ao montar
+  }, []); 
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -74,10 +74,10 @@ export default function RegistrarCalibracao(props) {
     props.setStatus(statusCalc);
     props.setAlerta(statusCalc === 'Fora' ? 'Atenção: Fora da tolerância!' : '');
 
-    // Busca o nome do equipamento selecionado
+    
     const equipamentoSelecionado = props.equipamentos.find(eq => eq.id === Number(equipamentoId));
 
-    // Monta objeto para o PDF
+    F
     const dadosParaPdf = {
       ...dados,
       equipamento_nome: equipamentoSelecionado ? equipamentoSelecionado.nome : '',
@@ -207,7 +207,7 @@ export default function RegistrarCalibracao(props) {
               {[0, 1, 2].map(i => (
                 <input
                   key={i}
-                  type="number" // ou "text" se quiser permitir qualquer formato
+                  type="number" 
                   name={`valorReferencia${i}`}
                   value={dados.valoresReferencia[i] || ''}
                   onChange={handleChange}
@@ -236,7 +236,7 @@ export default function RegistrarCalibracao(props) {
               {[0, 1, 2].map(i => (
                 <input
                   key={i}
-                  type="number" // ou "text" se quiser permitir qualquer formato
+                  type="number" 
                   name={`valorCalibrado${i}`}
                   value={dados.valoresCalibrado[i] || ''}
                   onChange={handleChange}

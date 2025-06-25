@@ -11,7 +11,7 @@ export default function EquipmentList({
   empresa,
   onDelete,
   onUpdate,
-  onLogout // <-- adicione aqui
+  onLogout 
 }) {
   const [editId, setEditId] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -38,7 +38,7 @@ export default function EquipmentList({
   async function saveEdit(id) {
     await window.api.editarEquipamento({ id, ...editForm });
     setEditId(null);
-    if (onUpdate) onUpdate(); // Atualiza a lista sem recarregar
+    if (onUpdate) onUpdate(); 
   }
 
   function cancelEdit() {
@@ -111,7 +111,7 @@ export default function EquipmentList({
                       <button onClick={async () => {
                         await window.api.editarEquipamento({ id: eq.id, ...editForm });
                         setEditId(null);
-                        if (onUpdate) await onUpdate(); // <-- Chame a função de atualização aqui!
+                        if (onUpdate) await onUpdate(); 
                       }}>Salvar</button>
                       <button onClick={cancelEdit}>Cancelar</button>
                     </td>

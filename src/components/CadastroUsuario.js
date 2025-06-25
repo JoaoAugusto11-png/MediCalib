@@ -16,7 +16,7 @@ export default function CadastroUsuario({ onCadastroSucesso, onBack }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    // Define tipo como 'usuario' fixo
+   
     const resposta = await window.api.cadastrarUsuario({ ...form, tipo: 'usuario' });
     if (resposta.success) {
       setToken(resposta.token);

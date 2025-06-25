@@ -12,8 +12,8 @@ function App() {
   const [logged, setLogged] = useState(false);
   const [showRecuperarSenha, setShowRecuperarSenha] = useState(false);
   const [username, setUsername] = useState('');
-  const [userType, setUserType] = useState(''); // 'admin' ou 'usuario'
-  const [empresa, setEmpresa] = useState('');   // <-- Adicionado
+  const [userType, setUserType] = useState(''); 
+  const [empresa, setEmpresa] = useState('');  
   const [userId, setUserId] = useState(null);
   const [tab, setTab] = useState('list');
   const [equipments, setEquipments] = useState([]);
@@ -60,7 +60,7 @@ function App() {
 
   function handleVoltarRecuperarSenha() {
     setShowRecuperarSenha(false);
-    // Não precisa mais do setLoginKey
+    
   }
 
   function handleLogout() {
@@ -70,7 +70,7 @@ function App() {
     setEmpresa('');
     setUserId('');
     setEquipments([]);
-    // Se tiver outros estados do usuário, limpe aqui também
+    
   }
 
   if (!logged) {
@@ -103,7 +103,7 @@ function App() {
   if (tab === 'calibracao') {
     return (
       <RegistrarCalibracao
-        key={tab} // Isso força o React a desmontar e remontar o componente ao trocar de tela
+        key={tab} 
         username={username}
         userType={userType}
         empresa={empresa}

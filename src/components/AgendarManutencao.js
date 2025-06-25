@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import RegisterEquipment from "./RegisterEquipment"; // Certifique-se de que o caminho está correto
+import RegisterEquipment from "./RegisterEquipment"; 
 
 const inputStyle = {
   width: '100%',
@@ -32,7 +32,7 @@ const submitBtn = {
 };
 
 export default function AgendarManutencao({ onBack, username, userType, empresa, userId, onRegister, equipamentos }) {
-  // Garante que equipamentos sempre é um array
+  
   const equipamentosList = Array.isArray(equipamentos) ? equipamentos : [];
 
   const [form, setForm] = useState({
@@ -73,7 +73,7 @@ export default function AgendarManutencao({ onBack, username, userType, empresa,
         prioridade,
         dataHora: data_hora_prevista,
         causa,
-        tecnico, // nome do técnico
+        tecnico, 
         supervisor,
         duracao,
         janelaInicio: janela_inicio,
@@ -94,7 +94,7 @@ export default function AgendarManutencao({ onBack, username, userType, empresa,
         prioridade,
         data_hora_prevista,
         causa,
-        tecnico_id: userId, // <-- ID do usuário logado
+        tecnico_id: userId, 
         supervisor,
         duracao,
         janela_inicio,
@@ -102,7 +102,7 @@ export default function AgendarManutencao({ onBack, username, userType, empresa,
         requer_aprovacao,
         justificativa,
         status,
-        usuario_id: userId // se precisar registrar o usuário que agendou
+        usuario_id: userId 
       });
       if (resposta && resposta.success) {
         alert("Manutenção agendada com sucesso!");

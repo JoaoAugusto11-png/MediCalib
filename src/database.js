@@ -1,7 +1,7 @@
 const Database = require('better-sqlite3');
 const db = new Database('medicalib.db');
 
-// Criação das tabelas (execute uma vez)
+
 db.exec(`
 CREATE TABLE IF NOT EXISTS usuarios (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,18 +100,18 @@ function gerarToken() {
   return Math.random().toString(36).substr(2, 8).toUpperCase();
 }
 
-// Função para cadastrar usuário (apenas admin deve poder usar)
+
 function cadastrarUsuario({ nome, login, senha, tipo, empresa }) {
-  const token = gerarToken(); // Função que gera o token
+  const token = gerarToken(); 
   const stmt = db.prepare(`
     INSERT INTO usuarios (nome, login, senha, tipo, empresa, token)
     VALUES (?, ?, ?, ?, ?, ?)
   `);
   stmt.run(nome, login, senha, tipo, empresa, token);
-  return { success: true, token }; // <-- IMPORTANTE: retorna o token
+  return { success: true, token }; 
 }
 
-// Função para autenticar login
+
 function autenticarUsuario({ login, senha }) {
   const stmt = db.prepare(`
     SELECT id, nome, tipo, empresa FROM usuarios WHERE login = ? AND senha = ?
@@ -138,14 +138,14 @@ function listarEquipamentosPorUsuario(usuario_id) {
   return stmt.all(usuario_id);
 }
 
-// Excluir equipamento
+
 function excluirEquipamento(id) {
   const stmt = db.prepare('DELETE FROM equipamentos WHERE id = ?');
   stmt.run(id);
   return { success: true };
 }
 
-// Editar equipamento
+o
 function editarEquipamento({ id, nome, fabricante, modelo, numero_serie }) {
   const stmt = db.prepare(`
     UPDATE equipamentos
@@ -156,7 +156,7 @@ function editarEquipamento({ id, nome, fabricante, modelo, numero_serie }) {
   return { success: true };
 }
 
-// Validar token de recuperação de senha
+
 function validarToken({ login, token }) {
   const stmt = db.prepare(`
     SELECT id FROM usuarios
@@ -167,7 +167,7 @@ function validarToken({ login, token }) {
   return !!usuario;
 }
 
-// Redefinir senha usando token
+
 function redefinirSenha({ login, token, novaSenha }) {
   const stmt = db.prepare(`
     UPDATE usuarios
