@@ -96,7 +96,8 @@ Para iniciar a aplicação em modo de desenvolvimento, execute o seguinte comand
 npm start
 
 ---
-📂 Estrutura do Projeto
+
+## 📂 Estrutura do Projeto
 A estrutura de pastas do projeto está organizada da seguinte forma:
 
 medicalib/
